@@ -1,6 +1,7 @@
 // CSS Grid Mastery - Application Logic
 
 let currentLesson = 'intro';
+const totalLessons = 21;
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,6 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
 function loadLesson(lessonId) {
     const lesson = lessons[lessonId];
     if (!lesson) return;
+    
+    // Mark previous lesson as complete (if not a challenge)
+    if (currentLesson && !currentLesson.startsWith('challenge')) {
+        markComplete(currentLesson);
+    }
     
     currentLesson = lessonId;
     
@@ -305,9 +311,10 @@ function checkChallenge1() {
     const hasSidebar = code.includes('sidebar') || code.includes('200px');
     
     if (hasAreas && hasHeader && hasFooter && hasSidebar) {
-        alert('🎉 Great job! Your Holy Grail layout looks correct!');
+        celebrate('Holy Grail Mastered! 🏆');
+        markComplete('challenge-1');
     } else {
-        alert('Not quite there yet. Make sure you have:\n- grid-template-areas defined\n- Header spanning full width\n- Sidebar at 200px\n- Footer spanning full width');
+        showHint('Not quite there yet. Make sure you have:\n• grid-template-areas defined\n• Header spanning full width\n• Sidebar at 200px\n• Footer spanning full width');
     }
 }
 
@@ -320,9 +327,10 @@ function checkChallenge2() {
     const has1fr = code.includes('1fr');
     
     if (hasAutoFit && hasMinmax && has250 && has1fr) {
-        alert('🎉 Perfect! You\'ve mastered responsive grids!');
+        celebrate('Responsive Grid Master! 📱');
+        markComplete('challenge-2');
     } else {
-        alert('Almost there! Make sure you use:\n- repeat() with auto-fit or auto-fill\n- minmax(250px, 1fr)');
+        showHint('Almost there! Make sure you use:\n• repeat() with auto-fit or auto-fill\n• minmax(250px, 1fr)');
     }
 }
 
@@ -335,14 +343,67 @@ function checkChallenge3() {
     const has80 = code.includes('80px');
     
     if (hasAreas && hasSidebar && hasWidget && has80) {
-        alert('🎉 Excellent! Your dashboard layout is complete!');
+        celebrate('Dashboard Pro! 📊');
+        markComplete('challenge-3');
+        
+        // Check if all challenges complete
+        const completed = JSON.parse(localStorage.getItem('gridMasteryCompleted') || '[]');
+        if (completed.includes('challenge-1') && completed.includes('challenge-2') && completed.includes('challenge-3')) {
+            setTimeout(() => {
+                celebrate('🌟 CSS Grid Master! 🌟');
+            }, 2500);
+        }
     } else {
-        alert('Keep trying! Make sure you have:\n- grid-template-areas with sidebar, header, main, widget1, widget2\n- Sidebar at 80px spanning all rows');
+        showHint('Keep trying! Make sure you have:\n• grid-template-areas with sidebar, header, main, widget1, widget2\n• Sidebar at 80px spanning all rows');
     }
+}
+
+// Show hint toast
+function showHint(message) {
+    const hint = document.createElement('div');
+    hint.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--bg-card);
+        border: 1px solid var(--warning);
+        border-radius: var(--radius);
+        padding: 16px 24px;
+        max-width: 350px;
+        z-index: 3000;
+        animation: fadeIn 0.3s ease;
+        white-space: pre-line;
+    `;
+    hint.innerHTML = `
+        <div style="display: flex; align-items: start; gap: 12px;">
+            <span style="font-size: 1.5rem;">💡</span>
+            <div>
+                <strong style="color: var(--warning);">Hint</strong>
+                <p style="margin-top: 4px; color: var(--text-secondary); font-size: 0.9rem;">${message}</p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(hint);
+    
+    setTimeout(() => {
+        hint.style.animation = 'fadeIn 0.3s ease reverse';
+        setTimeout(() => hint.remove(), 300);
+    }, 4000);
 }
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
+    // Escape to close modals
+    if (e.key === 'Escape') {
+        hideCheatsheet();
+    }
+    
+    // ? to show cheatsheet
+    if (e.key === '?' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        showCheatsheet();
+    }
+    
     // Cmd/Ctrl + Enter to run code
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         updatePreview(currentLesson);
@@ -357,6 +418,20 @@ document.addEventListener('keydown', (e) => {
         } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
             navigateTo(lessonOrder[currentIndex - 1]);
         }
+    }
+    
+    // Tab key in textarea for indentation
+    if (e.key === 'Tab' && e.target.tagName === 'TEXTAREA') {
+        e.preventDefault();
+        const textarea = e.target;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        
+        textarea.value = textarea.value.substring(0, start) + '    ' + textarea.value.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + 4;
+        
+        // Trigger preview update
+        textarea.dispatchEvent(new Event('input'));
     }
 });
 
@@ -373,6 +448,24 @@ function markComplete(lessonId) {
     if (link) {
         link.classList.add('completed');
     }
+    
+    // Update progress
+    updateProgress();
+}
+
+// Update progress display
+function updateProgress() {
+    const completed = JSON.parse(localStorage.getItem('gridMasteryCompleted') || '[]');
+    const count = completed.length;
+    const percent = Math.round((count / totalLessons) * 100);
+    
+    const percentEl = document.getElementById('progress-percent');
+    const fillEl = document.getElementById('progress-fill');
+    const textEl = document.getElementById('progress-text');
+    
+    if (percentEl) percentEl.textContent = `${percent}%`;
+    if (fillEl) fillEl.style.width = `${percent}%`;
+    if (textEl) textEl.textContent = `${count} of ${totalLessons} lessons`;
 }
 
 // Load completed state on init
@@ -384,6 +477,60 @@ function loadCompletedState() {
             link.classList.add('completed');
         }
     });
+    updateProgress();
+}
+
+// Cheatsheet modal
+function showCheatsheet() {
+    document.getElementById('cheatsheet-modal').classList.add('active');
+}
+
+function hideCheatsheet() {
+    document.getElementById('cheatsheet-modal').classList.remove('active');
+}
+
+// Celebration animation
+function celebrate(message = 'Challenge Complete!') {
+    // Fire confetti
+    if (typeof confetti !== 'undefined') {
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+        
+        // Double burst
+        setTimeout(() => {
+            confetti({
+                particleCount: 50,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 }
+            });
+            confetti({
+                particleCount: 50,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 }
+            });
+        }, 250);
+    }
+    
+    // Show celebration card
+    const celebration = document.createElement('div');
+    celebration.className = 'celebration';
+    celebration.innerHTML = `
+        <div class="emoji">🎉</div>
+        <h2>${message}</h2>
+        <p>Great job! Keep learning!</p>
+    `;
+    document.body.appendChild(celebration);
+    
+    // Remove after 2 seconds
+    setTimeout(() => {
+        celebration.style.animation = 'celebrateIn 0.3s ease reverse';
+        setTimeout(() => celebration.remove(), 300);
+    }, 2000);
 }
 
 // Call on load

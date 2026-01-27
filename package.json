@@ -1,0 +1,36 @@
+{
+  "name": "css-grid-mastery",
+  "version": "1.0.0",
+  "description": "Interactive CSS Grid learning platform for 10x Academy students",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx serve . -l 3000",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:visual": "playwright test --grep 'Visual Regression'",
+    "test:update-snapshots": "playwright test --update-snapshots",
+    "report": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsotne01/css-grid-mastery.git"
+  },
+  "keywords": [
+    "css",
+    "grid",
+    "learning",
+    "interactive",
+    "10x-academy"
+  ],
+  "author": "Tsotne Chkhenkeli",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tsotne01/css-grid-mastery/issues"
+  },
+  "homepage": "https://tsotne01.github.io/css-grid-mastery/",
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "serve": "^14.2.5"
+  }
+}
