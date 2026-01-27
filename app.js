@@ -462,10 +462,19 @@ function updateProgress() {
     const percentEl = document.getElementById('progress-percent');
     const fillEl = document.getElementById('progress-fill');
     const textEl = document.getElementById('progress-text');
+    const certBtn = document.getElementById('cert-btn');
     
     if (percentEl) percentEl.textContent = `${percent}%`;
     if (fillEl) fillEl.style.width = `${percent}%`;
     if (textEl) textEl.textContent = `${count} of ${totalLessons} lessons`;
+    
+    // Unlock certificate when complete
+    if (certBtn) {
+        if (count >= totalLessons) {
+            certBtn.classList.add('unlocked');
+            certBtn.textContent = '🏆 Certificate Unlocked!';
+        }
+    }
 }
 
 // Load completed state on init
@@ -563,4 +572,65 @@ document.querySelectorAll('.nav-link').forEach(link => {
     });
 });
 
-console.log('🎨 CSS Grid Mastery loaded! Use arrow keys to navigate lessons.');
+// Theme toggle
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('gridMasteryTheme', newTheme);
+    
+    // Update icon
+    document.getElementById('theme-icon').textContent = newTheme === 'light' ? '☀️' : '🌙';
+}
+
+// Load saved theme
+function loadTheme() {
+    const savedTheme = localStorage.getItem('gridMasteryTheme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+}
+
+// Initialize theme
+loadTheme();
+
+// Show completion certificate
+function showCertificate() {
+    const completed = JSON.parse(localStorage.getItem('gridMasteryCompleted') || '[]');
+    if (completed.length < totalLessons) {
+        alert(`Complete all ${totalLessons} lessons to unlock your certificate! (${completed.length}/${totalLessons} done)`);
+        return;
+    }
+    
+    const cert = document.createElement('div');
+    cert.className = 'modal-overlay active';
+    cert.onclick = () => cert.remove();
+    cert.innerHTML = `
+        <div class="modal-content certificate" onclick="event.stopPropagation()">
+            <div class="cert-header">🏆</div>
+            <h2>Certificate of Completion</h2>
+            <p class="cert-subtitle">This certifies that</p>
+            <p class="cert-name">A Dedicated Student</p>
+            <p class="cert-subtitle">has successfully mastered</p>
+            <h3>CSS Grid Layout</h3>
+            <p class="cert-details">Completing all 21 lessons and 3 challenges</p>
+            <p class="cert-date">${new Date().toLocaleDateString()}</p>
+            <div class="cert-footer">
+                <span>10x Academy</span>
+                <span>CSS Grid Mastery</span>
+            </div>
+            <button class="btn btn-primary" onclick="this.parentElement.parentElement.remove()" style="margin-top: 20px;">Close</button>
+        </div>
+    `;
+    document.body.appendChild(cert);
+    
+    // Confetti!
+    if (typeof confetti !== 'undefined') {
+        confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+    }
+}
+
+console.log('🎨 CSS Grid Mastery loaded!');
+console.log('⌨️ Keyboard shortcuts: ← → navigate | ? cheatsheet | Tab indent | Esc close');

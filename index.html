@@ -28,6 +28,9 @@
             <span class="logo-icon">⊞</span>
             <span>CSS Grid Mastery</span>
         </div>
+        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+            <span id="theme-icon">🌙</span>
+        </div>
         <div class="nav-section">
             <h3>Fundamentals</h3>
             <a href="#intro" class="nav-link active" data-lesson="intro">Introduction</a>
@@ -73,6 +76,7 @@
                 <div class="progress-fill" id="progress-fill"></div>
             </div>
             <p class="progress-text" id="progress-text">0 of 21 lessons</p>
+            <button class="cert-btn" id="cert-btn" onclick="showCertificate()">🏆 View Certificate</button>
         </div>
         <div class="nav-footer">
             <a href="#cheatsheet" class="cheatsheet-link" onclick="showCheatsheet()">📋 Quick Reference</a>
