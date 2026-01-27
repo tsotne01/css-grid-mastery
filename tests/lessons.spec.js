@@ -278,3 +278,156 @@ test.describe('Accessibility', () => {
   });
 
 });
+
+// ============== GAME SYSTEM TESTS ==============
+
+test.describe('Game System', () => {
+  
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    // Clear game state
+    await page.evaluate(() => {
+      localStorage.removeItem('gridMasteryGameState');
+    });
+    await page.reload();
+  });
+
+  test('player stats bar is visible', async ({ page }) => {
+    await expect(page.locator('.player-stats')).toBeVisible();
+    await expect(page.locator('#player-level')).toBeVisible();
+    await expect(page.locator('#player-xp')).toBeVisible();
+    await expect(page.locator('#streak-count')).toBeVisible();
+  });
+
+  test('games navigation buttons exist', async ({ page }) => {
+    await expect(page.locator('.games-nav')).toBeVisible();
+    await expect(page.locator('button:has-text("Grid Battle")')).toBeVisible();
+    await expect(page.locator('button:has-text("Debug Detective")')).toBeVisible();
+    await expect(page.locator('button:has-text("Clone Challenge")')).toBeVisible();
+    await expect(page.locator('button:has-text("Daily Challenge")')).toBeVisible();
+    await expect(page.locator('button:has-text("Achievements")')).toBeVisible();
+  });
+
+  test('Grid Battle mode loads', async ({ page }) => {
+    await page.click('button:has-text("Grid Battle")');
+    
+    await expect(page.locator('h1:has-text("Grid Battle")')).toBeVisible();
+    await expect(page.locator('.challenge-list')).toBeVisible();
+    
+    // Check that challenges are listed
+    await expect(page.locator('.challenge-list-item')).toHaveCount(35); // All challenges
+  });
+
+  test('Grid Battle category filter works', async ({ page }) => {
+    await page.click('button:has-text("Grid Battle")');
+    
+    // Click Speed Run category
+    await page.click('button:has-text("Speed Run")');
+    
+    // Should show only speed challenges (10)
+    await expect(page.locator('.challenge-list-item')).toHaveCount(10);
+  });
+
+  test('can start a Grid Battle challenge', async ({ page }) => {
+    await page.click('button:has-text("Grid Battle")');
+    
+    // Click first challenge
+    await page.click('.challenge-list-item:first-child');
+    
+    // Should see timer and code editor
+    await expect(page.locator('.game-timer')).toBeVisible();
+    await expect(page.locator('#battle-code')).toBeVisible();
+    await expect(page.locator('#target-preview')).toBeVisible();
+  });
+
+  test('Debug Detective mode loads', async ({ page }) => {
+    await page.click('button:has-text("Debug Detective")');
+    
+    await expect(page.locator('h1:has-text("Debug Detective")')).toBeVisible();
+    await expect(page.locator('.challenge-list')).toBeVisible();
+    
+    // Check that challenges are listed (10)
+    await expect(page.locator('.challenge-list-item')).toHaveCount(10);
+  });
+
+  test('can start a Debug challenge', async ({ page }) => {
+    await page.click('button:has-text("Debug Detective")');
+    await page.click('.challenge-list-item:first-child');
+    
+    // Should see code editor with buggy code
+    await expect(page.locator('#debug-code')).toBeVisible();
+    await expect(page.locator('button:has-text("Show Hint")')).toBeVisible();
+  });
+
+  test('Clone Challenge mode loads', async ({ page }) => {
+    await page.click('button:has-text("Clone Challenge")');
+    
+    await expect(page.locator('h1:has-text("Clone Challenge")')).toBeVisible();
+    await expect(page.locator('.challenge-list')).toBeVisible();
+    
+    // Check that challenges are listed (5)
+    await expect(page.locator('.challenge-list-item')).toHaveCount(5);
+  });
+
+  test('Daily Challenge shows streak and calendar', async ({ page }) => {
+    await page.click('button:has-text("Daily Challenge")');
+    
+    await expect(page.locator('h1:has-text("Daily Challenge")')).toBeVisible();
+    await expect(page.locator('.streak-display')).toBeVisible();
+    await expect(page.locator('.daily-calendar')).toBeVisible();
+  });
+
+  test('Achievements page shows all achievements', async ({ page }) => {
+    await page.click('button:has-text("Achievements")');
+    
+    await expect(page.locator('h1:has-text("Achievements")')).toBeVisible();
+    await expect(page.locator('.achievements-grid')).toBeVisible();
+    
+    // Should show all achievement cards (15)
+    await expect(page.locator('.achievement-card')).toHaveCount(15);
+  });
+
+  test('back to lessons button works', async ({ page }) => {
+    await page.click('button:has-text("Grid Battle")');
+    await expect(page.locator('h1:has-text("Grid Battle")')).toBeVisible();
+    
+    // Click back button
+    await page.click('button:has-text("Back to Lessons")');
+    
+    // Should show lessons again
+    await expect(page.locator('#lesson-container')).toBeVisible();
+  });
+
+  test('XP display starts at 0', async ({ page }) => {
+    await expect(page.locator('#player-xp')).toHaveText('0');
+  });
+
+  test('Level displays correctly', async ({ page }) => {
+    await expect(page.locator('#player-level')).toContainText('Novice');
+  });
+
+});
+
+test.describe('Game State Persistence', () => {
+  
+  test('game state saves to localStorage', async ({ page }) => {
+    await page.goto('/');
+    
+    // Set some XP via JavaScript
+    await page.evaluate(() => {
+      gameState.xp = 500;
+      gameState.achievements = ['firstLesson'];
+      gameState.save();
+    });
+    
+    // Reload and check
+    await page.reload();
+    
+    const xp = await page.evaluate(() => gameState.xp);
+    expect(xp).toBe(500);
+    
+    const achievements = await page.evaluate(() => gameState.achievements);
+    expect(achievements).toContain('firstLesson');
+  });
+
+});

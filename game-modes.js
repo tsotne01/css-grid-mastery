@@ -52,11 +52,28 @@ function backToLessons() {
 }
 
 // ============== GRID BATTLE ==============
+let currentBattleCategory = 'all';
+
 function renderGridBattleMenu() {
     gameState.recordGameMode('gridBattle');
     const container = document.getElementById('game-container');
     
-    const completedBattles = gameState.gridBattleStats.played || 0;
+    const categories = [
+        { id: 'all', name: 'All Challenges', emoji: '📋' },
+        { id: 'basic', name: 'Basic (1-10)', emoji: '🌱' },
+        { id: 'responsive', name: 'Responsive', emoji: '📱' },
+        { id: 'speed', name: 'Speed Run', emoji: '⚡' },
+        { id: 'advanced', name: 'Advanced', emoji: '🔥' }
+    ];
+    
+    const filteredChallenges = GRID_BATTLE_CHALLENGES.filter(c => {
+        if (currentBattleCategory === 'all') return true;
+        if (currentBattleCategory === 'basic') return c.id <= 10;
+        return c.category === currentBattleCategory;
+    });
+    
+    const completedCount = (gameState.gridBattleStats.completed || []).length;
+    const totalCount = GRID_BATTLE_CHALLENGES.length;
     
     container.innerHTML = `
         <div class="game-container">
@@ -68,23 +85,35 @@ function renderGridBattleMenu() {
             <div class="challenge-card">
                 <h2>Time Attack Mode</h2>
                 <p class="description">Race against the clock to recreate CSS Grid layouts. The faster and more accurate you are, the higher your score!</p>
-                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
                     <span class="difficulty difficulty-1">⚡ Speed Bonus</span>
                     <span class="difficulty difficulty-2">🎯 Accuracy Points</span>
                     <span class="difficulty difficulty-3">💯 Perfect Bonus</span>
                 </div>
+                <div style="margin-top: 16px;">
+                    <strong>${completedCount}/${totalCount}</strong> challenges completed
+                </div>
             </div>
             
-            <h3 style="margin-bottom: 16px;">Select Challenge</h3>
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+                ${categories.map(cat => `
+                    <button class="game-btn ${currentBattleCategory === cat.id ? 'primary' : 'secondary'}" 
+                            onclick="setBattleCategory('${cat.id}')" style="flex: 0 0 auto;">
+                        ${cat.emoji} ${cat.name}
+                    </button>
+                `).join('')}
+            </div>
+            
             <div class="challenge-list">
-                ${GRID_BATTLE_CHALLENGES.map((c, i) => `
+                ${filteredChallenges.map(c => `
                     <div class="challenge-list-item ${gameState.gridBattleStats.completed?.includes(c.id) ? 'completed' : ''}" 
                          onclick="startGridBattle(${c.id})">
                         <div class="info">
                             <span class="name">${c.name}</span>
                             <span class="meta">
                                 <span class="difficulty difficulty-${c.difficulty}">${'⭐'.repeat(c.difficulty)}</span>
-                                · ${c.timeLimit}s time limit
+                                · ${c.timeLimit}s
+                                ${c.category ? ` · ${c.category}` : ''}
                             </span>
                         </div>
                     </div>
@@ -93,6 +122,12 @@ function renderGridBattleMenu() {
         </div>
     `;
 }
+
+function setBattleCategory(category) {
+    currentBattleCategory = category;
+    renderGridBattleMenu();
+}
+window.setBattleCategory = setBattleCategory;
 
 function startGridBattle(challengeId) {
     const challenge = GRID_BATTLE_CHALLENGES.find(c => c.id === challengeId);

@@ -499,6 +499,343 @@ gap: 15px;
 min-height: 400px;`,
         html: '<div class="item" style="grid-column: 1 / -1">Header</div><div class="item" style="grid-row: 2 / -1">Nav</div><div class="item">Widget 1</div><div class="item">Widget 2</div><div class="item" style="grid-row: 2 / -1">Stats</div><div class="item" style="grid-column: 2 / 4">Main Content</div>',
         hints: ['Use negative line numbers', 'Span from 2 to -1 for remaining', 'Mix fixed and flexible columns']
+    },
+    // ============== RESPONSIVE CHALLENGES (11-20) ==============
+    {
+        id: 11,
+        name: "Auto-Fit Cards",
+        difficulty: 2,
+        timeLimit: 90,
+        category: 'responsive',
+        description: "Create cards that auto-fit and wrap responsively",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 20px;`,
+        html: '<div class="item">Card 1</div><div class="item">Card 2</div><div class="item">Card 3</div><div class="item">Card 4</div>',
+        hints: ['auto-fit fills available space', 'minmax sets min and max size', 'Cards will wrap automatically']
+    },
+    {
+        id: 12,
+        name: "Auto-Fill vs Auto-Fit",
+        difficulty: 2,
+        timeLimit: 90,
+        category: 'responsive',
+        description: "Use auto-fill to maintain empty columns",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+gap: 15px;`,
+        html: '<div class="item">1</div><div class="item">2</div><div class="item">3</div>',
+        hints: ['auto-fill creates empty tracks', 'auto-fit collapses empty tracks', 'Both work with minmax']
+    },
+    {
+        id: 13,
+        name: "Fluid Typography Grid",
+        difficulty: 3,
+        timeLimit: 90,
+        category: 'responsive',
+        description: "Create a responsive text layout with clamp-like behavior",
+        targetCSS: `display: grid;
+grid-template-columns: minmax(300px, 60ch) 1fr;
+gap: 30px;`,
+        html: '<div class="item main-text">Main Content Area</div><div class="item sidebar">Sidebar</div>',
+        hints: ['ch unit is character width', 'Great for readable text widths', 'Combine minmax with fixed units']
+    },
+    {
+        id: 14,
+        name: "Responsive Image Gallery",
+        difficulty: 3,
+        timeLimit: 90,
+        category: 'responsive',
+        description: "Create a gallery that adapts from 1 to 4 columns",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+gap: 16px;`,
+        html: '<div class="item">📷</div><div class="item">📷</div><div class="item">📷</div><div class="item">📷</div><div class="item">📷</div><div class="item">📷</div><div class="item">📷</div><div class="item">📷</div>',
+        hints: ['More items = more responsive', '250px is a good breakpoint', 'Images maintain aspect ratio']
+    },
+    {
+        id: 15,
+        name: "Mobile-First Layout",
+        difficulty: 3,
+        timeLimit: 120,
+        category: 'responsive',
+        description: "Create a layout that stacks on mobile, side-by-side on desktop",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 24px;`,
+        html: '<div class="item">Section 1</div><div class="item">Section 2</div>',
+        hints: ['300px minimum for mobile', 'auto-fit expands on larger screens', 'Gap provides breathing room']
+    },
+    {
+        id: 16,
+        name: "Responsive Masonry-Like",
+        difficulty: 4,
+        timeLimit: 120,
+        category: 'responsive',
+        description: "Create a Pinterest-style layout with auto-rows",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+grid-auto-rows: 100px;
+gap: 15px;`,
+        html: '<div class="item" style="grid-row: span 2">Tall</div><div class="item">Small</div><div class="item" style="grid-row: span 3">Taller</div><div class="item">Small</div><div class="item" style="grid-row: span 2">Tall</div><div class="item">Small</div>',
+        hints: ['grid-auto-rows for implicit rows', 'Span rows for varying heights', 'Dense packing fills gaps']
+    },
+    {
+        id: 17,
+        name: "Full-Bleed Layout",
+        difficulty: 3,
+        timeLimit: 90,
+        category: 'responsive',
+        description: "Create content with full-width breakouts",
+        targetCSS: `display: grid;
+grid-template-columns: 1fr min(65ch, 100%) 1fr;
+gap: 20px;`,
+        html: '<div class="item" style="grid-column: 2">Centered Content</div><div class="item" style="grid-column: 1 / -1">Full Width!</div><div class="item" style="grid-column: 2">Centered Again</div>',
+        hints: ['min() picks smallest value', '65ch is readable width', '1 / -1 spans full width']
+    },
+    {
+        id: 18,
+        name: "Responsive Nav Grid",
+        difficulty: 2,
+        timeLimit: 90,
+        category: 'responsive',
+        description: "Navigation that wraps gracefully",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+gap: 10px;`,
+        html: '<div class="item">Home</div><div class="item">About</div><div class="item">Services</div><div class="item">Portfolio</div><div class="item">Contact</div>',
+        hints: ['100px min for nav items', 'auto-fit wraps on small screens', 'Equal-width items']
+    },
+    {
+        id: 19,
+        name: "Responsive Feature Grid",
+        difficulty: 3,
+        timeLimit: 90,
+        category: 'responsive',
+        description: "Feature cards with a hero spanning full width",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 24px;`,
+        html: '<div class="item" style="grid-column: 1 / -1">Hero Feature</div><div class="item">Feature 1</div><div class="item">Feature 2</div><div class="item">Feature 3</div>',
+        hints: ['Hero spans all columns', 'Features wrap responsively', '280px is tablet-friendly']
+    },
+    {
+        id: 20,
+        name: "Adaptive Sidebar",
+        difficulty: 4,
+        timeLimit: 120,
+        category: 'responsive',
+        description: "Sidebar that collapses on small screens",
+        targetCSS: `display: grid;
+grid-template-columns: fit-content(200px) 1fr;
+gap: 20px;`,
+        html: '<div class="item sidebar">Sidebar (shrinks)</div><div class="item main">Main Content</div>',
+        hints: ['fit-content() shrinks to content', 'Max 200px but can be smaller', 'Main content fills remaining']
+    },
+    // ============== SPEED CHALLENGES (21-30) ==============
+    {
+        id: 21,
+        name: "Quick 2x2",
+        difficulty: 1,
+        timeLimit: 30,
+        category: 'speed',
+        description: "Create a 2x2 grid - GO FAST!",
+        targetCSS: `display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;`,
+        html: '<div class="item">1</div><div class="item">2</div><div class="item">3</div><div class="item">4</div>',
+        hints: ['2 columns of 1fr each', 'Simple and fast!']
+    },
+    {
+        id: 22,
+        name: "Speed Center",
+        difficulty: 1,
+        timeLimit: 20,
+        category: 'speed',
+        description: "Center one item - fastest way!",
+        targetCSS: `display: grid;
+place-items: center;
+min-height: 200px;`,
+        html: '<div class="item">Centered!</div>',
+        hints: ['place-items is the shortcut', 'One property does it all!']
+    },
+    {
+        id: 23,
+        name: "Quick Columns",
+        difficulty: 1,
+        timeLimit: 30,
+        category: 'speed',
+        description: "3 equal columns, NOW!",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 15px;`,
+        html: '<div class="item">A</div><div class="item">B</div><div class="item">C</div>',
+        hints: ['repeat() saves typing', '3 columns of 1fr']
+    },
+    {
+        id: 24,
+        name: "Speed Span",
+        difficulty: 2,
+        timeLimit: 45,
+        category: 'speed',
+        description: "First item spans 2 columns!",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 10px;`,
+        html: '<div class="item" style="grid-column: span 2">Wide</div><div class="item">1</div><div class="item">2</div>',
+        hints: ['grid-column: span 2', '2-column grid base']
+    },
+    {
+        id: 25,
+        name: "Quick Header Footer",
+        difficulty: 2,
+        timeLimit: 45,
+        category: 'speed',
+        description: "Header + Content + Footer layout",
+        targetCSS: `display: grid;
+grid-template-rows: auto 1fr auto;
+min-height: 300px;`,
+        html: '<div class="item">Header</div><div class="item">Content</div><div class="item">Footer</div>',
+        hints: ['Rows: auto, 1fr, auto', 'Content grows to fill']
+    },
+    {
+        id: 26,
+        name: "Speed Gap",
+        difficulty: 1,
+        timeLimit: 30,
+        category: 'speed',
+        description: "4 items with 20px gap",
+        targetCSS: `display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 20px;`,
+        html: '<div class="item">1</div><div class="item">2</div><div class="item">3</div><div class="item">4</div>',
+        hints: ['gap: 20px', '2x2 grid with spacing']
+    },
+    {
+        id: 27,
+        name: "Quick Areas",
+        difficulty: 3,
+        timeLimit: 60,
+        category: 'speed',
+        description: "Use grid-template-areas FAST!",
+        targetCSS: `display: grid;
+grid-template-areas: "a a" "b c";
+gap: 10px;`,
+        html: '<div class="item" style="grid-area: a">A spans</div><div class="item" style="grid-area: b">B</div><div class="item" style="grid-area: c">C</div>',
+        hints: ['Named areas in quotes', 'Repeat names to span']
+    },
+    {
+        id: 28,
+        name: "Speed Fixed + Flex",
+        difficulty: 2,
+        timeLimit: 45,
+        category: 'speed',
+        description: "250px sidebar + flexible main",
+        targetCSS: `display: grid;
+grid-template-columns: 250px 1fr;
+gap: 20px;`,
+        html: '<div class="item">Sidebar</div><div class="item">Main</div>',
+        hints: ['Fixed + flexible', '250px then 1fr']
+    },
+    {
+        id: 29,
+        name: "Quick Stack",
+        difficulty: 1,
+        timeLimit: 30,
+        category: 'speed',
+        description: "Stack items vertically with gap",
+        targetCSS: `display: grid;
+gap: 16px;`,
+        html: '<div class="item">One</div><div class="item">Two</div><div class="item">Three</div>',
+        hints: ['No columns needed!', 'Just display: grid + gap']
+    },
+    {
+        id: 30,
+        name: "Speed Dense",
+        difficulty: 3,
+        timeLimit: 60,
+        category: 'speed',
+        description: "Fill gaps with dense packing!",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(3, 1fr);
+grid-auto-flow: dense;
+gap: 10px;`,
+        html: '<div class="item" style="grid-column: span 2">Wide 1</div><div class="item">2</div><div class="item" style="grid-column: span 2">Wide 2</div><div class="item">3</div><div class="item">4</div>',
+        hints: ['grid-auto-flow: dense', 'Fills gaps automatically']
+    },
+    // ============== ADVANCED PATTERNS (31-35) ==============
+    {
+        id: 31,
+        name: "Magazine Layout",
+        difficulty: 4,
+        timeLimit: 120,
+        category: 'advanced',
+        description: "Create a complex magazine-style layout",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(4, 1fr);
+grid-template-rows: repeat(3, 100px);
+gap: 15px;`,
+        html: '<div class="item" style="grid-column: span 2; grid-row: span 2">Feature</div><div class="item">Story 1</div><div class="item">Story 2</div><div class="item" style="grid-row: span 2">Sidebar</div><div class="item" style="grid-column: span 2">Wide Story</div>',
+        hints: ['Combine row and column spans', 'Think in rectangles', '4-column base grid']
+    },
+    {
+        id: 32,
+        name: "App Shell",
+        difficulty: 4,
+        timeLimit: 120,
+        category: 'advanced',
+        description: "Create a modern app layout with header, sidebar, main, footer",
+        targetCSS: `display: grid;
+grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+grid-template-columns: 240px 1fr;
+grid-template-rows: 60px 1fr 40px;
+min-height: 400px;`,
+        html: '<div class="item" style="grid-area: header">Header</div><div class="item" style="grid-area: sidebar">Sidebar</div><div class="item" style="grid-area: main">Main Content</div><div class="item" style="grid-area: footer">Footer</div>',
+        hints: ['Use grid-template-areas', 'Combine areas with explicit sizes', 'Standard app layout']
+    },
+    {
+        id: 33,
+        name: "Card Masonry",
+        difficulty: 4,
+        timeLimit: 120,
+        category: 'advanced',
+        description: "Create a masonry-like card layout",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(3, 1fr);
+grid-auto-rows: 50px;
+gap: 12px;`,
+        html: '<div class="item" style="grid-row: span 3">Tall Card</div><div class="item" style="grid-row: span 2">Medium</div><div class="item" style="grid-row: span 4">Extra Tall</div><div class="item" style="grid-row: span 2">Medium</div><div class="item" style="grid-row: span 3">Tall</div>',
+        hints: ['Small auto-rows as units', 'Span different row counts', 'Creates varied heights']
+    },
+    {
+        id: 34,
+        name: "12-Column Grid",
+        difficulty: 4,
+        timeLimit: 120,
+        category: 'advanced',
+        description: "Create a Bootstrap-style 12-column system",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(12, 1fr);
+gap: 20px;`,
+        html: '<div class="item" style="grid-column: span 12">Full Width (12)</div><div class="item" style="grid-column: span 6">Half (6)</div><div class="item" style="grid-column: span 6">Half (6)</div><div class="item" style="grid-column: span 4">Third (4)</div><div class="item" style="grid-column: span 4">Third (4)</div><div class="item" style="grid-column: span 4">Third (4)</div>',
+        hints: ['12 columns of 1fr', 'Span for different widths', 'Like Bootstrap columns']
+    },
+    {
+        id: 35,
+        name: "Hero + Grid",
+        difficulty: 4,
+        timeLimit: 120,
+        category: 'advanced',
+        description: "Hero image with content grid below",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(3, 1fr);
+grid-template-rows: 200px auto;
+gap: 20px;`,
+        html: '<div class="item" style="grid-column: 1 / -1">Hero Image</div><div class="item">Card 1</div><div class="item">Card 2</div><div class="item">Card 3</div>',
+        hints: ['Hero spans all columns', 'First row fixed height', 'Cards auto-size below']
     }
 ];
 
