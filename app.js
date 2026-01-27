@@ -389,4 +389,31 @@ function loadCompletedState() {
 // Call on load
 loadCompletedState();
 
+// Mobile sidebar toggle
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    sidebar.classList.toggle('open');
+    
+    // Create overlay if it doesn't exist
+    if (!overlay) {
+        const newOverlay = document.createElement('div');
+        newOverlay.className = 'sidebar-overlay';
+        newOverlay.onclick = toggleSidebar;
+        document.body.appendChild(newOverlay);
+    }
+    
+    document.querySelector('.sidebar-overlay')?.classList.toggle('active');
+}
+
+// Close sidebar when clicking a nav link on mobile
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            toggleSidebar();
+        }
+    });
+});
+
 console.log('🎨 CSS Grid Mastery loaded! Use arrow keys to navigate lessons.');
