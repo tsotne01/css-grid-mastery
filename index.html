@@ -67,6 +67,29 @@
             <a href="#challenge-2" class="nav-link" data-lesson="challenge-2">Challenge: Card Grid</a>
             <a href="#challenge-3" class="nav-link" data-lesson="challenge-3">Challenge: Dashboard</a>
         </div>
+        <div class="nav-section games-nav">
+            <h3>🎮 Games</h3>
+            <button class="game-mode-btn" onclick="loadGameMode('gridBattle')">
+                <span class="emoji">⚔️</span>
+                <span>Grid Battle</span>
+            </button>
+            <button class="game-mode-btn" onclick="loadGameMode('debugDetective')">
+                <span class="emoji">🔍</span>
+                <span>Debug Detective</span>
+            </button>
+            <button class="game-mode-btn" onclick="loadGameMode('cloneChallenge')">
+                <span class="emoji">🎨</span>
+                <span>Clone Challenge</span>
+            </button>
+            <button class="game-mode-btn" onclick="loadGameMode('dailyChallenge')">
+                <span class="emoji">📅</span>
+                <span>Daily Challenge</span>
+            </button>
+            <button class="game-mode-btn" onclick="loadGameMode('achievements')">
+                <span class="emoji">🏆</span>
+                <span>Achievements</span>
+            </button>
+        </div>
         <div class="progress-section">
             <div class="progress-header">
                 <span>Progress</span>
@@ -164,12 +187,31 @@
     </div>
 
     <main class="content">
+        <div class="player-stats" id="player-stats">
+            <div class="stat-level">
+                <span id="player-level">🌱 Novice</span>
+            </div>
+            <div class="stat-xp-bar">
+                <div class="fill" id="level-progress" style="width: 0%"></div>
+            </div>
+            <div class="stat-xp">
+                <span id="player-xp">0</span> XP
+            </div>
+            <div class="stat-streak">
+                🔥 <span id="streak-count">0</span> day streak
+            </div>
+        </div>
         <div id="lesson-container">
             <!-- Lessons loaded dynamically -->
+        </div>
+        <div id="game-container" style="display: none;">
+            <!-- Game modes loaded dynamically -->
         </div>
     </main>
 
     <script src="lessons.js"></script>
+    <script src="games.js"></script>
     <script src="app.js"></script>
+    <script src="game-modes.js"></script>
 </body>
 </html>
