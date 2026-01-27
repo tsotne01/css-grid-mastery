@@ -321,10 +321,15 @@ test.describe('Game System', () => {
   test('Grid Battle category filter works', async ({ page }) => {
     await page.click('button:has-text("Grid Battle")');
     
-    // Click Speed Run category
-    await page.click('button:has-text("Speed Run")');
+    // Wait for challenges to load
+    await expect(page.locator('.challenge-list')).toBeVisible();
+    await expect(page.locator('.challenge-list-item')).toHaveCount(35, { timeout: 10000 });
     
-    // Should show only speed challenges (10)
+    // Click "Responsive" category filter (inside game-container, not sidebar)
+    await page.locator('#game-container button:has-text("Responsive")').click();
+    
+    // Wait for re-render and should show only responsive challenges (10)
+    await page.waitForTimeout(300);
     await expect(page.locator('.challenge-list-item')).toHaveCount(10);
   });
 

@@ -632,5 +632,68 @@ function showCertificate() {
     }
 }
 
+// Sound toggle
+function toggleSound() {
+    if (window.sounds) {
+        const enabled = window.sounds.toggle();
+        document.getElementById('sound-icon').textContent = enabled ? '🔊' : '🔇';
+    }
+}
+
+// Load sound preference
+function loadSoundState() {
+    const enabled = localStorage.getItem('soundEnabled') !== 'false';
+    const icon = document.getElementById('sound-icon');
+    if (icon) icon.textContent = enabled ? '🔊' : '🔇';
+}
+
+// Initialize sound state
+document.addEventListener('DOMContentLoaded', loadSoundState);
+
+// Integrate with analytics
+const originalMarkComplete = markComplete;
+markComplete = function(lessonId) {
+    originalMarkComplete(lessonId);
+    
+    // Track with analytics
+    if (window.analytics) {
+        window.analytics.endLesson(lessonId, true);
+    }
+    
+    // Play sound
+    if (window.sounds) {
+        window.sounds.playSuccess();
+    }
+};
+
+// Track lesson start
+const originalLoadLesson = loadLesson;
+loadLesson = function(lessonId) {
+    // Track with analytics
+    if (window.analytics) {
+        if (currentLesson) {
+            window.analytics.endLesson(currentLesson, false);
+        }
+        window.analytics.startLesson(lessonId);
+    }
+    
+    originalLoadLesson(lessonId);
+};
+
+// Enhance celebrate with sound
+const originalCelebrate = celebrate;
+celebrate = function(message = 'Challenge Complete!') {
+    originalCelebrate(message);
+    
+    if (window.sounds) {
+        window.sounds.playLevelUp();
+    }
+    
+    if (window.particles) {
+        window.particles.celebrate();
+    }
+};
+
 console.log('🎨 CSS Grid Mastery loaded!');
 console.log('⌨️ Keyboard shortcuts: ← → navigate | ? cheatsheet | Tab indent | Esc close');
+console.log('🔊 Sound: Alt+S to toggle | ♿ Accessibility: Alt+A');

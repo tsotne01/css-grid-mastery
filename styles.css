@@ -1909,3 +1909,443 @@ body {
         font-size: 0.75rem;
     }
 }
+
+/* ============== Header Controls ============== */
+.header-controls {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+}
+
+.header-controls .theme-toggle,
+.header-controls .sound-toggle {
+    position: static;
+}
+
+.sound-toggle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.sound-toggle:hover {
+    background: var(--bg-hover);
+    transform: scale(1.05);
+}
+
+/* ============== Puzzle Mode Styles ============== */
+.puzzle-game {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.puzzle-blanks {
+    background: var(--bg-code);
+    border-radius: var(--radius);
+    padding: 20px;
+}
+
+.puzzle-line {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.puzzle-line:last-child {
+    border-bottom: none;
+}
+
+.puzzle-line code {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+}
+
+.puzzle-blank {
+    display: inline-block;
+    min-width: 150px;
+    padding: 4px 12px;
+    background: var(--bg-hover);
+    border: 2px dashed var(--accent);
+    border-radius: 4px;
+    text-align: center;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.puzzle-blank.filled {
+    background: var(--accent);
+    border-style: solid;
+    color: white;
+}
+
+.puzzle-blank:hover {
+    border-color: var(--accent-hover);
+}
+
+.puzzle-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+}
+
+.puzzle-option {
+    padding: 10px 20px;
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.puzzle-option:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+}
+
+.puzzle-option.selected {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.puzzle-option:active {
+    cursor: grabbing;
+}
+
+.puzzle-result {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-card);
+    padding: 40px;
+    border-radius: var(--radius);
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.puzzle-result.success {
+    border: 2px solid var(--success);
+}
+
+.puzzle-result.error {
+    border: 2px solid var(--error);
+}
+
+.puzzle-result h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.puzzle-result p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+/* ============== Survival Mode Styles ============== */
+.survival-intro,
+.speedrun-intro {
+    text-align: center;
+    padding: 40px;
+}
+
+.survival-stats,
+.speedrun-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 0;
+}
+
+.survival-stat,
+.speedrun-stat {
+    text-align: center;
+}
+
+.survival-stat .label,
+.speedrun-stat .label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.survival-stat .value,
+.speedrun-stat .value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.survival-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+}
+
+.survival-lives {
+    font-size: 1.5rem;
+    letter-spacing: 4px;
+}
+
+.survival-score {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.survival-streak {
+    font-size: 1rem;
+}
+
+.survival-challenge,
+.speedrun-challenge {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 30px;
+}
+
+.bug-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.bug-option {
+    padding: 15px 20px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
+.bug-option.wrong {
+    background: var(--error) !important;
+    color: white !important;
+    animation: shake 0.3s ease;
+}
+
+.game-over {
+    text-align: center;
+    padding: 60px;
+}
+
+.game-over h1 {
+    font-size: 3rem;
+    margin-bottom: 30px;
+}
+
+.final-score {
+    margin: 30px 0;
+}
+
+.final-score .score-value {
+    font-size: 4rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.final-score .score-label {
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+.game-over-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 0;
+}
+
+.game-over-stats .stat {
+    text-align: center;
+}
+
+.game-over-stats .stat .label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.game-over-stats .stat .value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-top: 4px;
+}
+
+.game-over-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 30px;
+}
+
+/* ============== Speed Run Styles ============== */
+.speedrun-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+}
+
+.speedrun-timer {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: var(--font-mono);
+    color: var(--accent);
+}
+
+.speedrun-progress {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+.speedrun-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.speedrun-finish {
+    text-align: center;
+    padding: 60px;
+}
+
+.speedrun-finish h1 {
+    font-size: 3rem;
+    margin-bottom: 30px;
+}
+
+.finish-time {
+    margin: 30px 0;
+}
+
+.finish-time .time-value {
+    font-size: 4rem;
+    font-weight: bold;
+    font-family: var(--font-mono);
+    color: var(--accent);
+}
+
+.finish-time .time-label {
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+.finish-stats {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin: 30px 0;
+}
+
+.finish-stats .stat {
+    text-align: center;
+}
+
+.finish-stats .stat .value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.finish-stats .stat .label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.new-record {
+    font-size: 1.5rem;
+    color: var(--success);
+    margin: 20px 0;
+    animation: pulse 0.5s ease infinite;
+}
+
+.finish-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 30px;
+}
+
+/* Large game button */
+.game-btn.large {
+    font-size: 1.2rem;
+    padding: 16px 40px;
+}
+
+/* ============== Mobile Adjustments ============== */
+@media (max-width: 768px) {
+    .header-controls {
+        top: 12px;
+        right: 12px;
+    }
+    
+    .header-controls .theme-toggle,
+    .header-controls .sound-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    
+    .puzzle-options {
+        justify-content: center;
+    }
+    
+    .bug-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .survival-stats,
+    .speedrun-stats,
+    .game-over-stats,
+    .finish-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .survival-header,
+    .speedrun-header {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .speedrun-timer {
+        font-size: 1.5rem;
+    }
+    
+    .final-score .score-value,
+    .finish-time .time-value {
+        font-size: 2.5rem;
+    }
+    
+    .game-over-buttons,
+    .finish-buttons {
+        flex-direction: column;
+    }
+}

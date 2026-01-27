@@ -10,7 +10,14 @@
     <meta property="og:description" content="Interactive CSS Grid learning platform with live code editors and challenges.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tsotne01.github.io/css-grid-mastery/">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⊞</text></svg>">
+    <!-- PWA Support -->
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Grid Mastery">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -28,8 +35,13 @@
             <span class="logo-icon">⊞</span>
             <span>CSS Grid Mastery</span>
         </div>
-        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
-            <span id="theme-icon">🌙</span>
+        <div class="header-controls">
+            <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme (Alt+T)">
+                <span id="theme-icon">🌙</span>
+            </div>
+            <div class="sound-toggle" onclick="toggleSound()" title="Toggle sound (Alt+S)">
+                <span id="sound-icon">🔊</span>
+            </div>
         </div>
         <div class="nav-section">
             <h3>Fundamentals</h3>
@@ -81,6 +93,18 @@
                 <span class="emoji">🎨</span>
                 <span>Clone Challenge</span>
             </button>
+            <button class="game-mode-btn" onclick="loadGameMode('puzzleMode')">
+                <span class="emoji">🧩</span>
+                <span>Puzzle Mode</span>
+            </button>
+            <button class="game-mode-btn" onclick="loadGameMode('survivalMode')">
+                <span class="emoji">💀</span>
+                <span>Survival Mode</span>
+            </button>
+            <button class="game-mode-btn" onclick="loadGameMode('speedRun')">
+                <span class="emoji">⏱️</span>
+                <span>Speed Run</span>
+            </button>
             <button class="game-mode-btn" onclick="loadGameMode('dailyChallenge')">
                 <span class="emoji">📅</span>
                 <span>Daily Challenge</span>
@@ -88,6 +112,10 @@
             <button class="game-mode-btn" onclick="loadGameMode('achievements')">
                 <span class="emoji">🏆</span>
                 <span>Achievements</span>
+            </button>
+            <button class="game-mode-btn" onclick="loadGameMode('analytics')">
+                <span class="emoji">📊</span>
+                <span>My Stats</span>
             </button>
         </div>
         <div class="progress-section">
@@ -211,7 +239,23 @@
 
     <script src="lessons.js"></script>
     <script src="games.js"></script>
+    <script src="sounds.js"></script>
+    <script src="tutorial.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="localization.js"></script>
+    <script src="analytics.js"></script>
     <script src="app.js"></script>
     <script src="game-modes.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+    </script>
 </body>
 </html>

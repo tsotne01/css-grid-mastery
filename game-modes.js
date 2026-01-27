@@ -873,6 +873,707 @@ function renderAchievements() {
     `;
 }
 
+// ============== PUZZLE MODE ==============
+// Drag and drop CSS properties to correct places
+
+const PUZZLE_CHALLENGES = [
+    {
+        id: 1,
+        name: "Basic Grid Setup",
+        description: "Arrange the properties to create a 3-column grid",
+        blanks: ["display: ___", "grid-template-columns: ___", "gap: ___"],
+        options: ["grid", "repeat(3, 1fr)", "20px", "flex", "auto", "10%"],
+        correctAnswers: ["grid", "repeat(3, 1fr)", "20px"],
+        xp: 30
+    },
+    {
+        id: 2,
+        name: "Spanning Columns",
+        description: "Make an item span 2 columns",
+        blanks: ["grid-column: ___"],
+        options: ["span 2", "1 / 3", "2", "auto"],
+        correctAnswers: ["span 2"],
+        xp: 25
+    },
+    {
+        id: 3,
+        name: "Grid Areas",
+        description: "Complete the grid area setup",
+        blanks: ["grid-template-areas: ___", "grid-area: ___"],
+        options: ["'header header' 'sidebar main'", "header", "'a b' 'c d'", "main"],
+        correctAnswers: ["'header header' 'sidebar main'", "header"],
+        xp: 40
+    },
+    {
+        id: 4,
+        name: "Alignment Magic",
+        description: "Center items both horizontally and vertically",
+        blanks: ["place-items: ___"],
+        options: ["center", "start", "end", "stretch"],
+        correctAnswers: ["center"],
+        xp: 20
+    },
+    {
+        id: 5,
+        name: "Responsive Grid",
+        description: "Create an auto-responsive grid",
+        blanks: ["grid-template-columns: repeat(___, minmax(200px, 1fr))"],
+        options: ["auto-fit", "auto-fill", "3", "auto"],
+        correctAnswers: ["auto-fit"],
+        xp: 35
+    }
+];
+
+let currentPuzzle = null;
+let puzzleAnswers = [];
+
+function renderPuzzleMode() {
+    gameState.recordGameMode('puzzleMode');
+    const container = document.getElementById('game-container');
+    
+    const completedPuzzles = gameState.gridBattleStats.puzzlesCompleted || [];
+    
+    container.innerHTML = `
+        <div class="game-container">
+            <div class="game-header">
+                <h1>🧩 Puzzle Mode</h1>
+                <button class="game-btn secondary" onclick="backToLessons()">← Back</button>
+            </div>
+            
+            <div class="challenge-card">
+                <h2>Drag & Drop CSS</h2>
+                <p class="description">Drag the correct CSS values into the blanks to complete each grid layout. Test your CSS Grid knowledge!</p>
+                <div style="margin-top: 16px;">
+                    <strong>${completedPuzzles.length}/${PUZZLE_CHALLENGES.length}</strong> puzzles solved
+                </div>
+            </div>
+            
+            <div class="challenge-list">
+                ${PUZZLE_CHALLENGES.map(puzzle => `
+                    <div class="challenge-item ${completedPuzzles.includes(puzzle.id) ? 'completed' : ''}" 
+                         onclick="startPuzzle(${puzzle.id})">
+                        <div class="challenge-info">
+                            <span class="challenge-name">${puzzle.name}</span>
+                            <span class="challenge-desc">${puzzle.description}</span>
+                        </div>
+                        <div class="challenge-meta">
+                            <span class="xp-badge">+${puzzle.xp} XP</span>
+                            ${completedPuzzles.includes(puzzle.id) ? '<span class="completed-badge">✓</span>' : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    // Play sound
+    if (window.sounds) window.sounds.playClick();
+}
+
+function startPuzzle(puzzleId) {
+    currentPuzzle = PUZZLE_CHALLENGES.find(p => p.id === puzzleId);
+    if (!currentPuzzle) return;
+    
+    puzzleAnswers = new Array(currentPuzzle.blanks.length).fill(null);
+    
+    const container = document.getElementById('game-container');
+    
+    container.innerHTML = `
+        <div class="game-container puzzle-game">
+            <div class="game-header">
+                <h1>🧩 ${currentPuzzle.name}</h1>
+                <button class="game-btn secondary" onclick="renderPuzzleMode()">← Back</button>
+            </div>
+            
+            <p class="description">${currentPuzzle.description}</p>
+            
+            <div class="puzzle-blanks">
+                ${currentPuzzle.blanks.map((blank, i) => `
+                    <div class="puzzle-line">
+                        <code>${blank.replace('___', `<span class="puzzle-blank" data-index="${i}" 
+                            ondragover="event.preventDefault()" 
+                            ondrop="dropAnswer(event, ${i})">${puzzleAnswers[i] || '___'}</span>`)}</code>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="puzzle-options" id="puzzle-options">
+                ${currentPuzzle.options.map(opt => `
+                    <div class="puzzle-option" draggable="true" 
+                         ondragstart="dragAnswer(event, '${opt}')"
+                         onclick="selectAnswer('${opt}')">
+                        ${opt}
+                    </div>
+                `).join('')}
+            </div>
+            
+            <button class="game-btn primary" onclick="checkPuzzle()">Check Answer</button>
+        </div>
+    `;
+    
+    if (window.sounds) window.sounds.playStart();
+}
+
+let selectedAnswer = null;
+
+function selectAnswer(answer) {
+    selectedAnswer = answer;
+    document.querySelectorAll('.puzzle-option').forEach(el => {
+        el.classList.toggle('selected', el.textContent.trim() === answer);
+    });
+}
+
+function dragAnswer(event, answer) {
+    event.dataTransfer.setData('text/plain', answer);
+}
+
+function dropAnswer(event, index) {
+    event.preventDefault();
+    const answer = event.dataTransfer.getData('text/plain');
+    puzzleAnswers[index] = answer;
+    updatePuzzleUI();
+}
+
+function updatePuzzleUI() {
+    document.querySelectorAll('.puzzle-blank').forEach((el, i) => {
+        el.textContent = puzzleAnswers[i] || '___';
+        el.classList.toggle('filled', !!puzzleAnswers[i]);
+    });
+}
+
+function checkPuzzle() {
+    if (!currentPuzzle) return;
+    
+    const correct = currentPuzzle.correctAnswers.every((answer, i) => 
+        puzzleAnswers[i] === answer || 
+        (Array.isArray(answer) && answer.includes(puzzleAnswers[i]))
+    );
+    
+    if (correct) {
+        // Mark completed
+        if (!gameState.gridBattleStats.puzzlesCompleted) {
+            gameState.gridBattleStats.puzzlesCompleted = [];
+        }
+        if (!gameState.gridBattleStats.puzzlesCompleted.includes(currentPuzzle.id)) {
+            gameState.gridBattleStats.puzzlesCompleted.push(currentPuzzle.id);
+            gameState.addXP(currentPuzzle.xp, 'puzzle');
+        }
+        
+        if (window.sounds) window.sounds.playSuccess();
+        if (window.particles) window.particles.celebrate();
+        
+        showPuzzleResult(true);
+    } else {
+        if (window.sounds) window.sounds.playError();
+        showPuzzleResult(false);
+    }
+}
+
+function showPuzzleResult(success) {
+    const resultDiv = document.createElement('div');
+    resultDiv.className = `puzzle-result ${success ? 'success' : 'error'}`;
+    resultDiv.innerHTML = success 
+        ? `<h3>🎉 Correct!</h3><p>+${currentPuzzle.xp} XP</p><button class="game-btn primary" onclick="renderPuzzleMode()">Continue</button>`
+        : `<h3>❌ Not quite right</h3><p>Try again!</p><button class="game-btn secondary" onclick="this.parentElement.remove()">Retry</button>`;
+    document.querySelector('.puzzle-game').appendChild(resultDiv);
+}
+
+// ============== SURVIVAL MODE ==============
+// Endless challenges, 3 lives
+
+let survivalState = {
+    lives: 3,
+    score: 0,
+    streak: 0,
+    currentChallenge: null,
+    challengeIndex: 0
+};
+
+function renderSurvivalMode() {
+    gameState.recordGameMode('survivalMode');
+    const container = document.getElementById('game-container');
+    
+    const highScore = gameState.gridBattleStats.survivalHighScore || 0;
+    
+    container.innerHTML = `
+        <div class="game-container">
+            <div class="game-header">
+                <h1>💀 Survival Mode</h1>
+                <button class="game-btn secondary" onclick="backToLessons()">← Back</button>
+            </div>
+            
+            <div class="challenge-card survival-intro">
+                <h2>Can You Survive?</h2>
+                <p class="description">Endless CSS Grid challenges. You have 3 lives. One wrong answer = lose a life. How far can you go?</p>
+                
+                <div class="survival-stats">
+                    <div class="survival-stat">
+                        <span class="label">High Score</span>
+                        <span class="value">${highScore}</span>
+                    </div>
+                    <div class="survival-stat">
+                        <span class="label">Lives</span>
+                        <span class="value">❤️❤️❤️</span>
+                    </div>
+                </div>
+                
+                <button class="game-btn primary large" onclick="startSurvivalMode()">
+                    Start Survival
+                </button>
+            </div>
+        </div>
+    `;
+    
+    if (window.sounds) window.sounds.playClick();
+}
+
+function startSurvivalMode() {
+    survivalState = {
+        lives: 3,
+        score: 0,
+        streak: 0,
+        currentChallenge: null,
+        challengeIndex: 0
+    };
+    
+    nextSurvivalChallenge();
+    if (window.sounds) window.sounds.playStart();
+}
+
+function nextSurvivalChallenge() {
+    // Mix all challenges
+    const allChallenges = [...GRID_BATTLE_CHALLENGES, ...DEBUG_CHALLENGES.map(d => ({
+        ...d,
+        type: 'debug',
+        targetCSS: d.buggyCSS
+    }))];
+    
+    // Pick a random one
+    survivalState.currentChallenge = allChallenges[Math.floor(Math.random() * allChallenges.length)];
+    survivalState.challengeIndex++;
+    
+    renderSurvivalChallenge();
+}
+
+function renderSurvivalChallenge() {
+    const challenge = survivalState.currentChallenge;
+    const container = document.getElementById('game-container');
+    
+    const livesHTML = '❤️'.repeat(survivalState.lives) + '🖤'.repeat(3 - survivalState.lives);
+    
+    container.innerHTML = `
+        <div class="game-container survival-active">
+            <div class="survival-header">
+                <div class="survival-lives">${livesHTML}</div>
+                <div class="survival-score">Score: ${survivalState.score}</div>
+                <div class="survival-streak">🔥 ${survivalState.streak}</div>
+            </div>
+            
+            <div class="survival-challenge">
+                <h2>Challenge #${survivalState.challengeIndex}</h2>
+                ${challenge.type === 'debug' ? `
+                    <p class="description">Find and fix the bug!</p>
+                    <div class="code-display">
+                        <pre><code>${challenge.buggyCSS}</code></pre>
+                    </div>
+                    <div class="bug-options">
+                        ${generateBugOptions(challenge).map((opt, i) => `
+                            <button class="game-btn bug-option" onclick="checkSurvivalAnswer('${opt}', ${i})">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                ` : `
+                    <p class="description">${challenge.description}</p>
+                    <div class="target-preview">
+                        <style>${challenge.targetCSS}</style>
+                        <div class="grid-preview" style="${challenge.targetCSS.match(/\.container\s*\{([^}]+)\}/)?.[1] || ''}">
+                            ${Array(challenge.gridItems || 6).fill(0).map((_, i) => 
+                                `<div class="grid-item">${i + 1}</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <textarea id="survival-code" class="code-editor" placeholder="Write your CSS...">${challenge.defaultCode || '.container {\n    display: grid;\n    \n}'}</textarea>
+                    <button class="game-btn primary" onclick="checkSurvivalCode()">Submit</button>
+                `}
+            </div>
+        </div>
+    `;
+}
+
+function generateBugOptions(challenge) {
+    // Generate multiple choice options including the correct fix
+    const correct = challenge.correctCSS.split(';')[0].trim();
+    const options = [correct];
+    
+    const fakeOptions = [
+        'grid-template-columns: auto',
+        'display: flex',
+        'gap: 0',
+        'grid-auto-flow: dense',
+        'justify-items: end'
+    ];
+    
+    while (options.length < 4) {
+        const fake = fakeOptions[Math.floor(Math.random() * fakeOptions.length)];
+        if (!options.includes(fake)) {
+            options.push(fake);
+        }
+    }
+    
+    // Shuffle
+    return options.sort(() => Math.random() - 0.5);
+}
+
+function checkSurvivalAnswer(answer, index) {
+    const challenge = survivalState.currentChallenge;
+    const correct = challenge.correctCSS.includes(answer);
+    
+    if (correct) {
+        survivalState.score += 100 * (1 + survivalState.streak * 0.1);
+        survivalState.streak++;
+        
+        if (window.sounds) window.sounds.playSuccess();
+        if (window.particles) {
+            const btn = document.querySelectorAll('.bug-option')[index];
+            const rect = btn.getBoundingClientRect();
+            window.particles.xpParticles(rect.left + rect.width/2, rect.top);
+        }
+        
+        setTimeout(() => nextSurvivalChallenge(), 500);
+    } else {
+        survivalState.lives--;
+        survivalState.streak = 0;
+        
+        if (window.sounds) window.sounds.playError();
+        
+        if (survivalState.lives <= 0) {
+            endSurvivalMode();
+        } else {
+            // Show wrong answer feedback
+            document.querySelectorAll('.bug-option')[index].classList.add('wrong');
+            setTimeout(() => nextSurvivalChallenge(), 1000);
+        }
+    }
+}
+
+function checkSurvivalCode() {
+    const code = document.getElementById('survival-code').value;
+    const challenge = survivalState.currentChallenge;
+    
+    // Simple validation
+    const requiredProps = (challenge.targetCSS.match(/[a-z-]+:/g) || [])
+        .map(p => p.replace(':', ''));
+    
+    const hasRequired = requiredProps.every(prop => code.includes(prop));
+    
+    if (hasRequired) {
+        survivalState.score += challenge.xp || 50;
+        survivalState.streak++;
+        
+        if (window.sounds) window.sounds.playSuccess();
+        setTimeout(() => nextSurvivalChallenge(), 500);
+    } else {
+        survivalState.lives--;
+        survivalState.streak = 0;
+        
+        if (window.sounds) window.sounds.playError();
+        
+        if (survivalState.lives <= 0) {
+            endSurvivalMode();
+        } else {
+            setTimeout(() => nextSurvivalChallenge(), 1000);
+        }
+    }
+}
+
+function endSurvivalMode() {
+    const container = document.getElementById('game-container');
+    
+    // Update high score
+    if (survivalState.score > (gameState.gridBattleStats.survivalHighScore || 0)) {
+        gameState.gridBattleStats.survivalHighScore = survivalState.score;
+        gameState.save();
+    }
+    
+    // Award XP based on score
+    const xpEarned = Math.floor(survivalState.score / 10);
+    gameState.addXP(xpEarned, 'survival');
+    
+    if (window.sounds) window.sounds.playLevelUp();
+    if (window.particles) window.particles.celebrate();
+    
+    container.innerHTML = `
+        <div class="game-container">
+            <div class="game-over">
+                <h1>💀 Game Over</h1>
+                <div class="final-score">
+                    <div class="score-value">${survivalState.score}</div>
+                    <div class="score-label">Final Score</div>
+                </div>
+                <div class="game-over-stats">
+                    <div class="stat">
+                        <span class="label">Challenges Completed</span>
+                        <span class="value">${survivalState.challengeIndex - 1}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">XP Earned</span>
+                        <span class="value">+${xpEarned}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">High Score</span>
+                        <span class="value">${gameState.gridBattleStats.survivalHighScore}</span>
+                    </div>
+                </div>
+                <div class="game-over-buttons">
+                    <button class="game-btn primary" onclick="startSurvivalMode()">Try Again</button>
+                    <button class="game-btn secondary" onclick="renderSurvivalMode()">Back to Menu</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ============== SPEED RUN MODE ==============
+// Complete all basics in minimum time
+
+let speedRunState = {
+    startTime: null,
+    currentIndex: 0,
+    completed: [],
+    totalTime: 0
+};
+
+const SPEED_RUN_CHALLENGES = GRID_BATTLE_CHALLENGES.filter(c => c.id <= 10);
+
+function renderSpeedRun() {
+    gameState.recordGameMode('speedRun');
+    const container = document.getElementById('game-container');
+    
+    const bestTime = gameState.gridBattleStats.speedRunBestTime;
+    const bestTimeFormatted = bestTime ? formatSpeedRunTime(bestTime) : '--:--';
+    
+    container.innerHTML = `
+        <div class="game-container">
+            <div class="game-header">
+                <h1>⏱️ Speed Run</h1>
+                <button class="game-btn secondary" onclick="backToLessons()">← Back</button>
+            </div>
+            
+            <div class="challenge-card speedrun-intro">
+                <h2>Race Against Time!</h2>
+                <p class="description">Complete all 10 basic Grid challenges as fast as possible. Your time starts when you click Start!</p>
+                
+                <div class="speedrun-stats">
+                    <div class="speedrun-stat">
+                        <span class="label">Best Time</span>
+                        <span class="value" id="best-time">${bestTimeFormatted}</span>
+                    </div>
+                    <div class="speedrun-stat">
+                        <span class="label">Challenges</span>
+                        <span class="value">${SPEED_RUN_CHALLENGES.length}</span>
+                    </div>
+                </div>
+                
+                <button class="game-btn primary large" onclick="startSpeedRun()">
+                    🏁 Start Speed Run
+                </button>
+            </div>
+        </div>
+    `;
+    
+    if (window.sounds) window.sounds.playClick();
+}
+
+function startSpeedRun() {
+    speedRunState = {
+        startTime: Date.now(),
+        currentIndex: 0,
+        completed: [],
+        totalTime: 0
+    };
+    
+    if (window.sounds) window.sounds.playStart();
+    renderSpeedRunChallenge();
+}
+
+function renderSpeedRunChallenge() {
+    const challenge = SPEED_RUN_CHALLENGES[speedRunState.currentIndex];
+    if (!challenge) {
+        finishSpeedRun();
+        return;
+    }
+    
+    const container = document.getElementById('game-container');
+    const elapsed = Date.now() - speedRunState.startTime;
+    
+    container.innerHTML = `
+        <div class="game-container speedrun-active">
+            <div class="speedrun-header">
+                <div class="speedrun-timer" id="speedrun-timer">${formatSpeedRunTime(elapsed)}</div>
+                <div class="speedrun-progress">
+                    ${speedRunState.currentIndex + 1} / ${SPEED_RUN_CHALLENGES.length}
+                </div>
+            </div>
+            
+            <div class="speedrun-challenge">
+                <h3>${challenge.name}</h3>
+                <p>${challenge.description}</p>
+                
+                <div class="target-preview">
+                    <style>${challenge.targetCSS}</style>
+                    <div class="grid-preview" style="${challenge.targetCSS.match(/\.container\s*\{([^}]+)\}/)?.[1] || ''}">
+                        ${Array(challenge.gridItems || 6).fill(0).map((_, i) => 
+                            `<div class="grid-item">${i + 1}</div>`
+                        ).join('')}
+                    </div>
+                </div>
+                
+                <textarea id="speedrun-code" class="code-editor">${challenge.defaultCode || '.container {\n    display: grid;\n    \n}'}</textarea>
+                
+                <div class="speedrun-buttons">
+                    <button class="game-btn primary" onclick="submitSpeedRunChallenge()">Next →</button>
+                    <button class="game-btn secondary" onclick="skipSpeedRunChallenge()">Skip</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Start timer update
+    updateSpeedRunTimer();
+}
+
+let speedRunTimerInterval = null;
+
+function updateSpeedRunTimer() {
+    if (speedRunTimerInterval) clearInterval(speedRunTimerInterval);
+    
+    speedRunTimerInterval = setInterval(() => {
+        const elapsed = Date.now() - speedRunState.startTime;
+        const timerEl = document.getElementById('speedrun-timer');
+        if (timerEl) {
+            timerEl.textContent = formatSpeedRunTime(elapsed);
+        }
+    }, 100);
+}
+
+function formatSpeedRunTime(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    const tenths = Math.floor((ms % 1000) / 100);
+    return `${minutes}:${secs.toString().padStart(2, '0')}.${tenths}`;
+}
+
+function submitSpeedRunChallenge() {
+    const challenge = SPEED_RUN_CHALLENGES[speedRunState.currentIndex];
+    const code = document.getElementById('speedrun-code').value;
+    
+    // Basic validation - check if required properties are present
+    const requiredProps = ['grid', 'grid-template'];
+    const hasBasics = requiredProps.some(prop => code.includes(prop));
+    
+    if (hasBasics) {
+        speedRunState.completed.push(challenge.id);
+        if (window.sounds) window.sounds.playSuccess();
+    } else {
+        if (window.sounds) window.sounds.playError();
+    }
+    
+    speedRunState.currentIndex++;
+    renderSpeedRunChallenge();
+}
+
+function skipSpeedRunChallenge() {
+    speedRunState.currentIndex++;
+    if (window.sounds) window.sounds.playClick();
+    renderSpeedRunChallenge();
+}
+
+function finishSpeedRun() {
+    if (speedRunTimerInterval) clearInterval(speedRunTimerInterval);
+    
+    const totalTime = Date.now() - speedRunState.startTime;
+    const completedCount = speedRunState.completed.length;
+    const xpEarned = completedCount * 25;
+    
+    // Update best time
+    if (completedCount === SPEED_RUN_CHALLENGES.length) {
+        const currentBest = gameState.gridBattleStats.speedRunBestTime;
+        if (!currentBest || totalTime < currentBest) {
+            gameState.gridBattleStats.speedRunBestTime = totalTime;
+            gameState.save();
+        }
+    }
+    
+    gameState.addXP(xpEarned, 'speedrun');
+    
+    if (window.sounds) window.sounds.playLevelUp();
+    if (window.particles) window.particles.celebrate();
+    
+    const container = document.getElementById('game-container');
+    container.innerHTML = `
+        <div class="game-container">
+            <div class="speedrun-finish">
+                <h1>🏁 Finished!</h1>
+                
+                <div class="finish-time">
+                    <div class="time-value">${formatSpeedRunTime(totalTime)}</div>
+                    <div class="time-label">Total Time</div>
+                </div>
+                
+                <div class="finish-stats">
+                    <div class="stat">
+                        <span class="value">${completedCount}/${SPEED_RUN_CHALLENGES.length}</span>
+                        <span class="label">Completed</span>
+                    </div>
+                    <div class="stat">
+                        <span class="value">+${xpEarned}</span>
+                        <span class="label">XP Earned</span>
+                    </div>
+                </div>
+                
+                ${completedCount === SPEED_RUN_CHALLENGES.length && totalTime === gameState.gridBattleStats.speedRunBestTime ? `
+                    <div class="new-record">🎉 New Personal Best!</div>
+                ` : ''}
+                
+                <div class="finish-buttons">
+                    <button class="game-btn primary" onclick="startSpeedRun()">Try Again</button>
+                    <button class="game-btn secondary" onclick="renderSpeedRun()">Back to Menu</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ============== ANALYTICS VIEW ==============
+function renderAnalytics() {
+    gameState.recordGameMode('analytics');
+    const container = document.getElementById('game-container');
+    
+    if (window.analytics) {
+        container.innerHTML = `
+            <div class="game-container">
+                <div class="game-header">
+                    <h1>📊 My Stats</h1>
+                    <button class="game-btn secondary" onclick="backToLessons()">← Back</button>
+                </div>
+                ${window.analytics.renderDashboard()}
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="game-container">
+                <div class="game-header">
+                    <h1>📊 My Stats</h1>
+                    <button class="game-btn secondary" onclick="backToLessons()">← Back</button>
+                </div>
+                <p>Analytics not available.</p>
+            </div>
+        `;
+    }
+}
+
 // ============== INITIALIZATION ==============
 document.addEventListener('DOMContentLoaded', () => {
     // Update player stats on load
@@ -880,6 +1581,57 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.updateUI();
     }
 });
+
+// Update loadGameMode to handle new modes
+const originalLoadGameMode = loadGameMode;
+loadGameMode = function(mode) {
+    currentGameMode = mode;
+    
+    // Hide lesson container, show game container
+    document.getElementById('lesson-container').style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+    
+    // Update nav
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.game-mode-btn').forEach(b => b.classList.remove('active'));
+    event?.target?.closest('.game-mode-btn')?.classList.add('active');
+    
+    // Update game state
+    if (typeof gameState !== 'undefined') {
+        gameState.updateUI();
+    }
+    
+    // Render appropriate mode
+    switch(mode) {
+        case 'gridBattle':
+            renderGridBattleMenu();
+            break;
+        case 'debugDetective':
+            renderDebugDetectiveMenu();
+            break;
+        case 'cloneChallenge':
+            renderCloneChallengeMenu();
+            break;
+        case 'puzzleMode':
+            renderPuzzleMode();
+            break;
+        case 'survivalMode':
+            renderSurvivalMode();
+            break;
+        case 'speedRun':
+            renderSpeedRun();
+            break;
+        case 'dailyChallenge':
+            renderDailyChallenge();
+            break;
+        case 'achievements':
+            renderAchievements();
+            break;
+        case 'analytics':
+            renderAnalytics();
+            break;
+    }
+};
 
 // Export functions
 window.loadGameMode = loadGameMode;
@@ -900,5 +1652,13 @@ window.renderDailyChallenge = renderDailyChallenge;
 window.startDailyChallenge = startDailyChallenge;
 window.shareDailyResult = shareDailyResult;
 window.renderAchievements = renderAchievements;
+window.renderPuzzleMode = renderPuzzleMode;
+window.startPuzzle = startPuzzle;
+window.checkPuzzle = checkPuzzle;
+window.renderSurvivalMode = renderSurvivalMode;
+window.startSurvivalMode = startSurvivalMode;
+window.renderSpeedRun = renderSpeedRun;
+window.startSpeedRun = startSpeedRun;
+window.renderAnalytics = renderAnalytics;
 
 console.log('🎮 Game modes loaded!');
