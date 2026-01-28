@@ -50,10 +50,18 @@ const TRANSLATIONS = {
             debugDetectiveDesc: 'Find and fix CSS bugs',
             cloneChallenge: 'Clone Challenge',
             cloneChallengeDesc: 'Recreate famous layouts',
+            puzzleMode: 'Puzzle Mode',
+            puzzleModeDesc: 'Solve grid puzzles',
+            survivalMode: 'Survival Mode',
+            survivalModeDesc: 'How long can you last?',
+            speedRun: 'Speed Run',
+            speedRunDesc: 'Complete lessons as fast as possible',
             dailyChallenge: 'Daily Challenge',
             dailyChallengeDesc: "Today's unique challenge",
             achievements: 'Achievements',
-            achievementsDesc: 'Track your progress'
+            achievementsDesc: 'Track your progress',
+            analytics: 'My Stats',
+            analyticsDesc: 'View your learning analytics'
         },
 
         // UI Elements
@@ -205,10 +213,18 @@ const TRANSLATIONS = {
             debugDetectiveDesc: 'იპოვე და გაასწორე CSS ბაგები',
             cloneChallenge: 'კლონირების გამოწვევა',
             cloneChallengeDesc: 'აღადგინე ცნობილი layout-ები',
+            puzzleMode: 'თავსატეხების რეჟიმი',
+            puzzleModeDesc: 'ამოხსენი Grid თავსატეხები',
+            survivalMode: 'გადარჩენის რეჟიმი',
+            survivalModeDesc: 'რამდენ ხანს გაძლებ?',
+            speedRun: 'სისწრაფის რბოლა',
+            speedRunDesc: 'დაასრულე გაკვეთილები რაც შეიძლება სწრაფად',
             dailyChallenge: 'დღის გამოწვევა',
             dailyChallengeDesc: 'დღევანდელი უნიკალური გამოწვევა',
             achievements: 'მიღწევები',
-            achievementsDesc: 'თვალი ადევნე პროგრესს'
+            achievementsDesc: 'თვალი ადევნე პროგრესს',
+            analytics: 'ჩემი სტატისტიკა',
+            analyticsDesc: 'ნახე შენი სწავლის ანალიტიკა'
         },
 
         ui: {
@@ -397,6 +413,125 @@ class LocalizationSystem {
         document.querySelectorAll('[data-i18n-aria]').forEach(el => {
             const key = el.dataset.i18nAria;
             el.setAttribute('aria-label', this.get(key));
+        });
+
+        // ============== DYNAMIC TRANSLATIONS ==============
+        // Update navigation section headers
+        const sectionHeaders = {
+            'Fundamentals': 'nav.fundamentals',
+            'Placement': 'nav.placement',
+            'Alignment': 'nav.alignment',
+            'Advanced': 'nav.advanced',
+            'Practice': 'nav.practice',
+            '🎮 Games': 'nav.games'
+        };
+        
+        document.querySelectorAll('.nav-section h3').forEach(h3 => {
+            const originalText = h3.textContent.trim();
+            // Check if this is the games header (has emoji)
+            if (originalText.includes('Games') || originalText.includes('თამაშები')) {
+                h3.textContent = this.get('nav.games');
+            } else {
+                // Find matching key
+                for (const [en, key] of Object.entries(sectionHeaders)) {
+                    if (originalText === en || this.translations.ka?.nav && Object.values(this.translations.ka.nav).includes(originalText)) {
+                        h3.textContent = this.get(key);
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Update nav links based on data-lesson attribute
+        const lessonKeyMap = {
+            'intro': 'lessons.intro',
+            'container': 'lessons.container',
+            'columns-rows': 'lessons.columnsRows',
+            'gap': 'lessons.gap',
+            'fr-unit': 'lessons.frUnit',
+            'line-placement': 'lessons.linePlacement',
+            'span': 'lessons.span',
+            'grid-areas': 'lessons.gridAreas',
+            'named-lines': 'lessons.namedLines',
+            'justify-items': 'lessons.justifyItems',
+            'align-items': 'lessons.alignItems',
+            'place-items': 'lessons.placeItems',
+            'justify-content': 'lessons.justifyContent',
+            'align-content': 'lessons.alignContent',
+            'auto-fill': 'lessons.autoFill',
+            'minmax': 'lessons.minmax',
+            'auto-flow': 'lessons.autoFlow',
+            'subgrid': 'lessons.subgrid',
+            'challenge-1': 'challenges.holyGrail',
+            'challenge-2': 'challenges.cardGrid',
+            'challenge-3': 'challenges.dashboard'
+        };
+
+        document.querySelectorAll('.nav-link[data-lesson]').forEach(link => {
+            const lesson = link.dataset.lesson;
+            if (lessonKeyMap[lesson]) {
+                link.textContent = this.get(lessonKeyMap[lesson]);
+            }
+        });
+
+        // Update game mode buttons
+        const gameModeMap = {
+            'gridBattle': { name: 'games.gridBattle', emoji: '⚔️' },
+            'debugDetective': { name: 'games.debugDetective', emoji: '🔍' },
+            'cloneChallenge': { name: 'games.cloneChallenge', emoji: '🎨' },
+            'puzzleMode': { name: 'games.puzzleMode', emoji: '🧩' },
+            'survivalMode': { name: 'games.survivalMode', emoji: '💀' },
+            'speedRun': { name: 'games.speedRun', emoji: '⏱️' },
+            'dailyChallenge': { name: 'games.dailyChallenge', emoji: '📅' },
+            'achievements': { name: 'games.achievements', emoji: '🏆' },
+            'analytics': { name: 'games.analytics', emoji: '📊' }
+        };
+
+        document.querySelectorAll('.game-mode-btn').forEach(btn => {
+            const onclick = btn.getAttribute('onclick');
+            if (onclick) {
+                const match = onclick.match(/loadGameMode\(['"](\w+)['"]\)/);
+                if (match && gameModeMap[match[1]]) {
+                    const textSpan = btn.querySelector('span:not(.emoji)');
+                    if (textSpan) {
+                        textSpan.textContent = this.get(gameModeMap[match[1]].name);
+                    }
+                }
+            }
+        });
+
+        // Update progress section
+        const progressLabel = document.querySelector('.progress-info span:first-child');
+        if (progressLabel && (progressLabel.textContent.includes('Progress') || progressLabel.textContent.includes('პროგრესი'))) {
+            progressLabel.textContent = this.get('ui.progress') + ':';
+        }
+
+        // Update "View Certificate" button
+        document.querySelectorAll('button').forEach(btn => {
+            const text = btn.textContent.trim();
+            if (text.includes('View Certificate') || text.includes('სერტიფიკატის ნახვა')) {
+                btn.textContent = '🎓 ' + this.get('ui.viewCertificate');
+            }
+            if (text.includes('Quick Reference') || text.includes('სწრაფი მითითება')) {
+                btn.textContent = this.get('ui.quickReference');
+            }
+        });
+
+        // Update footer text
+        const footer = document.querySelector('.nav-footer p');
+        if (footer) {
+            footer.innerHTML = `${this.get('ui.builtFor')} <a href="https://10x.edu.ge" target="_blank" rel="noopener">10x Academy</a> ${this.get('ui.by')} <a href="https://github.com/Tsotne01" target="_blank" rel="noopener">Tsotne</a>`;
+        }
+
+        // Update language switcher active state
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent.includes('EN') && this.currentLang === 'en') {
+                btn.classList.add('active');
+            }
+            if (btn.textContent.includes('ქა') && this.currentLang === 'ka') {
+                btn.classList.add('active');
+            }
         });
     }
 
