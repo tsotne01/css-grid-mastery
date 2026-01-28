@@ -370,8 +370,8 @@ test.describe('Game System', () => {
     await expect(page.locator('h1:has-text("Clone Challenge")')).toBeVisible();
     await expect(page.locator('.challenge-list')).toBeVisible();
     
-    // Check that challenges are listed (5)
-    await expect(page.locator('.challenge-list-item')).toHaveCount(5);
+    // Check that challenges are listed (10 total: 5 original + 5 new)
+    await expect(page.locator('.challenge-list-item')).toHaveCount(10);
   });
 
   test('Daily Challenge shows streak and calendar', async ({ page }) => {

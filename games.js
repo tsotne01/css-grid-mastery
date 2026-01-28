@@ -1608,6 +1608,193 @@ const CLONE_CHALLENGES = [
                 <div>🍴 234 forks</div>
             </div>
         `
+    },
+    // ============== MORE CLONE CHALLENGES ==============
+    {
+        id: 'instagram',
+        name: "Instagram Profile Grid",
+        difficulty: 2,
+        description: "Recreate Instagram's photo grid layout",
+        targetLayout: {
+            columns: 'repeat(3, 1fr)',
+            gap: '3px'
+        },
+        reference: `/* Instagram Grid */
+.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+}
+
+.photo {
+    aspect-ratio: 1;
+    background: #262626;
+}`,
+        html: `
+            <div class="photo">📷</div>
+            <div class="photo">📷</div>
+            <div class="photo">📷</div>
+            <div class="photo">📷</div>
+            <div class="photo">📷</div>
+            <div class="photo">📷</div>
+            <div class="photo">📷</div>
+            <div class="photo">📷</div>
+            <div class="photo">📷</div>
+        `
+    },
+    {
+        id: 'slack',
+        name: "Slack Workspace",
+        difficulty: 4,
+        description: "Recreate Slack's workspace layout",
+        targetLayout: {
+            columns: '70px 250px 1fr',
+            rows: '100%'
+        },
+        reference: `/* Slack Layout */
+.container {
+    display: grid;
+    grid-template-columns: 70px 250px 1fr;
+    height: 100%;
+}
+
+.servers { background: #3F0E40; }
+.channels { background: #19171D; }
+.messages { background: #1A1D21; }`,
+        html: `
+            <div class="servers">
+                <div>🏢</div>
+                <div>🏠</div>
+                <div>➕</div>
+            </div>
+            <div class="channels">
+                <h4># general</h4>
+                <h4># random</h4>
+                <h4># announcements</h4>
+            </div>
+            <div class="messages">
+                <div class="message">👤 User: Hello!</div>
+                <div class="message">👤 User: How are you?</div>
+            </div>
+        `
+    },
+    {
+        id: 'trello',
+        name: "Trello Board",
+        difficulty: 3,
+        description: "Recreate Trello's kanban board layout",
+        targetLayout: {
+            columns: 'repeat(auto-fill, 280px)',
+            gap: '12px',
+            flow: 'column'
+        },
+        reference: `/* Trello Board */
+.container {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 280px;
+    gap: 12px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+.list {
+    background: #ebecf0;
+    border-radius: 4px;
+    padding: 8px;
+}`,
+        html: `
+            <div class="list">
+                <h4>To Do</h4>
+                <div class="card">Task 1</div>
+                <div class="card">Task 2</div>
+            </div>
+            <div class="list">
+                <h4>In Progress</h4>
+                <div class="card">Task 3</div>
+            </div>
+            <div class="list">
+                <h4>Done</h4>
+                <div class="card">Task 4</div>
+                <div class="card">Task 5</div>
+            </div>
+        `
+    },
+    {
+        id: 'notion',
+        name: "Notion Page",
+        difficulty: 3,
+        description: "Recreate Notion's page layout with sidebar",
+        targetLayout: {
+            columns: '250px 1fr',
+            rows: '50px 1fr'
+        },
+        reference: `/* Notion Layout */
+.container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: 50px 1fr;
+    grid-template-areas:
+        "sidebar header"
+        "sidebar content";
+    height: 100%;
+}
+
+.sidebar { grid-area: sidebar; background: #f7f6f3; }
+.header { grid-area: header; }
+.content { grid-area: content; padding: 40px; }`,
+        html: `
+            <div class="sidebar">
+                <div>📄 Page 1</div>
+                <div>📄 Page 2</div>
+                <div>📁 Folder</div>
+            </div>
+            <div class="header">Notion Page Title</div>
+            <div class="content">
+                <h1>Welcome</h1>
+                <p>Start writing...</p>
+            </div>
+        `
+    },
+    {
+        id: 'airbnb',
+        name: "Airbnb Listing Grid",
+        difficulty: 3,
+        description: "Recreate Airbnb's property listing grid",
+        targetLayout: {
+            columns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: '24px'
+        },
+        reference: `/* Airbnb Grid */
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 24px;
+}
+
+.listing {
+    display: grid;
+    grid-template-rows: 200px auto auto;
+    gap: 8px;
+}`,
+        html: `
+            <div class="listing">
+                <div class="photo">🏠</div>
+                <div class="info">Cozy apartment · 2 beds</div>
+                <div class="price">$120/night</div>
+            </div>
+            <div class="listing">
+                <div class="photo">🏡</div>
+                <div class="info">Beach house · 4 beds</div>
+                <div class="price">$250/night</div>
+            </div>
+            <div class="listing">
+                <div class="photo">🏢</div>
+                <div class="info">City loft · 1 bed</div>
+                <div class="price">$95/night</div>
+            </div>
+        `
     }
 ];
 

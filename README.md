@@ -1,126 +1,72 @@
-# CSS Grid Mastery ⊞
+# CSS Grid Mastery 🎮
 
-An interactive learning platform for mastering CSS Grid, built for [10x Academy](https://10x.edu.ge) students.
+Master CSS Grid Layout through interactive lessons and fun game modes. Built for [10x Academy](https://10xacademy.ge) students.
 
-🔗 **Live Demo:** [https://tsotne01.github.io/css-grid-mastery/](https://tsotne01.github.io/css-grid-mastery/)
+**[🎮 Play Now →](https://tsotne01.github.io/css-grid-mastery/)**
 
-## Features
+![CSS Grid Mastery Screenshot](screenshots/preview.png)
 
-### 📚 Learning
-- **21 comprehensive lessons** covering everything from basics to advanced techniques
-- **Live code editors** with instant preview
-- **Interactive controls** to experiment with Grid properties
-- **3 practical challenges** to test your skills
+## ✨ Features
+
+### 📚 Interactive Lessons (21 total)
+- **Fundamentals**: Grid container, columns, rows, gaps, fr units
+- **Placement**: Line-based placement, spanning, grid areas, named lines
+- **Alignment**: Justify/align items and content, place-items
+- **Advanced**: Auto-fill/fit, minmax(), auto-flow, subgrid
 
 ### 🎮 Game Modes
-- **⚔️ Grid Battle** - Time attack challenges (35 total!)
-  - Basic challenges (10)
-  - Responsive challenges (10)
-  - Speed challenges (10)
-  - Advanced patterns (5)
-- **🔍 Debug Detective** - Find and fix CSS bugs (10 challenges)
-- **🎨 Clone Challenge** - Recreate real website layouts (5 challenges)
-  - Twitter, YouTube, Netflix, Spotify, GitHub
-- **📅 Daily Challenge** - New challenge every day with streaks!
+
+| Mode | Description | Challenges |
+|------|-------------|------------|
+| ⚔️ **Grid Battle** | Race against time to build layouts | 50 challenges |
+| 🔍 **Debug Detective** | Find and fix CSS bugs | 20 challenges |
+| 🎨 **Clone Challenge** | Recreate famous UI layouts | 10 challenges |
+| 🧩 **Puzzle Mode** | Drag & drop CSS properties | 5 puzzles |
+| 💀 **Survival Mode** | Endless challenges, 3 lives | Unlimited |
+| ⏱️ **Speed Run** | Complete basics as fast as possible | 10 challenges |
+| 📅 **Daily Challenge** | New challenge every day | Daily |
 
 ### 🏆 Progression System
-- **XP & Levels** - Earn XP and progress from Novice to Master
-- **15 Achievements** - Unlock badges for your accomplishments
-- **Streak Tracking** - Build daily learning habits
-- **Progress saved** to localStorage
+- **XP & Levels**: Novice → Apprentice → Intermediate → Advanced → Master
+- **15 Achievements**: Unlock badges for milestones
+- **Streaks**: Maintain daily learning streaks
+- **Analytics**: Track your progress with detailed stats
 
-### 💅 UI/UX
-- 📱 **Mobile responsive** design
-- 🌙 **Dark/Light mode** toggle
-- ⌨️ **Keyboard navigation** (arrow keys, Tab, ?)
-- 🎉 **Confetti celebrations** for achievements
+### 🌍 Languages
+- English 🇬🇧
+- Georgian 🇬🇪 (ქართული)
 
-## Topics Covered
+### ♿ Accessibility
+- High contrast mode
+- Reduced motion
+- Large text mode
+- Dyslexia-friendly font
+- Full keyboard navigation
+- Screen reader support
 
-### Fundamentals
-- Grid Container
-- Columns & Rows  
-- Gap & Spacing
-- The `fr` Unit
+### 📱 PWA Support
+- Install as an app
+- Works offline
+- Push notifications (coming soon)
 
-### Placement
-- Line-Based Placement
-- Spanning Items
-- Grid Areas
-- Named Lines
-
-### Alignment
-- justify-items / align-items
-- place-items
-- justify-content / align-content
-
-### Advanced
-- auto-fill & auto-fit
-- minmax()
-- Auto Flow
-- Subgrid
-
-## Game Mode Details
-
-### ⚔️ Grid Battle
-Race against the clock to recreate CSS Grid layouts:
-- See the target layout
-- Write CSS to match it
-- Score = Accuracy + Speed Bonus + Perfect Bonus
-- Use hints (costs points)
-
-### 🔍 Debug Detective  
-Find and fix common CSS Grid bugs:
-- Typos, missing properties, wrong values
-- Learn from common mistakes
-- Hints available
-
-### 🎨 Clone Challenge
-Recreate layouts from famous websites:
-- Twitter sidebar
-- YouTube video grid
-- Netflix browse row
-- Spotify playlist
-- GitHub repo page
-
-### 📅 Daily Challenge
-- New challenge generated each day
-- Build streaks for consecutive days
-- Share your results!
-
-## Built With
-
-- Pure HTML, CSS, JavaScript (no frameworks)
-- [Playwright](https://playwright.dev/) for testing
-- Hosted on GitHub Pages
-
-## For Students
-
-1. Start with the Introduction lesson
-2. Read the explanation, then experiment with the code editor
-3. Try the interactive controls where available
-4. Complete the challenges at the end
-5. Play the game modes to practice!
-6. Your progress is saved automatically!
-
-## Local Development
+## 🚀 Quick Start
 
 ```bash
 # Clone the repo
 git clone https://github.com/tsotne01/css-grid-mastery.git
 cd css-grid-mastery
 
-# Install dependencies
+# Install dependencies (for development)
 npm install
+
+# Open in browser
+open index.html
 
 # Run tests
 npx playwright test
-
-# Open in browser
-npx serve .
 ```
 
-## Testing
+## 🧪 Testing
 
 ```bash
 # Run all tests
@@ -129,14 +75,63 @@ npx playwright test
 # Run with UI
 npx playwright test --ui
 
-# Run specific project
-npx playwright test --project=chromium
+# Run specific test file
+npx playwright test tests/lessons.spec.js
 ```
 
-## Credits
+## 📁 Project Structure
 
-Built with ❤️ by Tsotne Chkhenkeli & Kai for 10x Academy
+```
+css-grid-mastery/
+├── index.html          # Main HTML file
+├── styles.css          # All styles
+├── lessons.js          # 21 lesson content
+├── games.js            # Game challenges & XP system
+├── game-modes.js       # Game mode UI
+├── sounds.js           # Sound effects & particles
+├── tutorial.js         # Onboarding system
+├── accessibility.js    # A11y features
+├── localization.js     # i18n (EN/KA)
+├── analytics.js        # Progress tracking
+├── social.js           # Share features
+├── app.js              # Main app logic
+├── sw.js               # Service worker
+├── manifest.json       # PWA manifest
+└── tests/
+    └── lessons.spec.js # Playwright tests
+```
+
+## 🎯 Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `←` `→` | Navigate lessons |
+| `?` | Show cheatsheet |
+| `Tab` | Indent code |
+| `Esc` | Close modal |
+| `Alt+S` | Toggle sound |
+| `Alt+H` | Toggle high contrast |
+| `Alt+M` | Toggle reduced motion |
+| `Alt+A` | Accessibility settings |
+
+## 📊 Stats
+
+- **33** Playwright tests
+- **50** Grid Battle challenges
+- **20** Debug challenges
+- **10** Clone challenges
+- **21** Lessons
+- **15** Achievements
+- **2** Languages
+
+## 🤝 Contributing
+
+Contributions welcome! Please check the [issues](https://github.com/tsotne01/css-grid-mastery/issues) page.
+
+## 📝 License
+
+MIT © [Tsotne Chkhenkeli](https://github.com/tsotne01) & [10x Academy](https://10xacademy.ge)
 
 ---
 
-*Master CSS Grid, and you'll never struggle with layouts again!* 🎮
+**Built with ❤️ by Kai & Tsotne for 10x Academy**
