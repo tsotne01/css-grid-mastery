@@ -20,7 +20,228 @@ document.addEventListener('DOMContentLoaded', () => {
             link.classList.add('active');
         });
     });
+    
+    // Re-render current content when language changes
+    if (window.i18n) {
+        window.i18n.onLanguageChange(() => {
+            // Reload current lesson if in lesson view
+            const lessonContainer = document.getElementById('lesson-container');
+            if (lessonContainer && lessonContainer.style.display !== 'none' && currentLesson) {
+                loadLesson(currentLesson);
+            }
+            // Reload current game mode if in game view
+            const gameContainer = document.getElementById('game-container');
+            if (gameContainer && gameContainer.style.display !== 'none' && typeof currentGameMode !== 'undefined' && currentGameMode) {
+                loadGameMode(currentGameMode);
+            }
+        });
+    }
 });
+
+// Get localized lesson title/subtitle
+function getLocalizedLessonText(lessonId, field) {
+    if (window.i18n && window.CONTENT_TRANSLATIONS?.lessons?.[lessonId]?.[field]) {
+        const trans = window.CONTENT_TRANSLATIONS.lessons[lessonId][field];
+        return trans[window.i18n.currentLang] || trans.en || lessons[lessonId][field];
+    }
+    return lessons[lessonId][field];
+}
+
+// Get localized lesson content (process HTML to translate embedded text)
+function getLocalizedLessonContent(lessonId) {
+    const lesson = lessons[lessonId];
+    if (!lesson) return '';
+    
+    let content = lesson.content;
+    const lang = window.i18n?.currentLang || 'en';
+    
+    // If English, return original content
+    if (lang === 'en') return content;
+    
+    // For Georgian, process the HTML to translate common strings
+    const translations = {
+        // Section headers and common phrases
+        'Pro Tip': 'პროფესიონალის რჩევა',
+        'Key Insight': 'მთავარი აღმოჩენა',
+        'Try This': 'სცადე ეს',
+        'Challenge': 'გამოწვევა',
+        'Need a hint?': 'გჭირდება მინიშნება?',
+        'Solution': 'ამოხსნა',
+        'Interactive Controls': 'ინტერაქტიული კონტროლები',
+        'Try Each Value': 'სცადე თითოეული მნიშვნელობა',
+        'Live Preview': 'პირდაპირი გადახედვა',
+        'Beginner': 'დამწყები',
+        'Intermediate': 'საშუალო',
+        'Advanced': 'გაღრმავებული',
+        'Reset': 'თავიდან',
+        'Common Patterns': 'გავრცელებული შაბლონები',
+        'Common Use Cases': 'გავრცელებული გამოყენების შემთხვევები',
+        // Lesson-specific sections (from content-translations)
+        'What is CSS Grid?': 'რა არის CSS Grid?',
+        'Grid vs Flexbox': 'Grid vs Flexbox',
+        'Your First Grid': 'შენი პირველი Grid',
+        'Creating a Grid Container': 'Grid კონტეინერის შექმნა',
+        'Grid vs Inline-Grid': 'Grid vs Inline-Grid',
+        'Defining Grid Tracks': 'Grid ტრეკების განსაზღვრა',
+        'The Gap Property': 'Gap თვისება',
+        'Gap Explorer': 'Gap-ის მკვლევარი',
+        'Row Gap': 'რიგის Gap',
+        'Column Gap': 'სვეტის Gap',
+        'Gap vs Margin': 'Gap vs Margin',
+        'What is fr?': 'რა არის fr?',
+        'Fraction Units': 'წილის ერთეულები',
+        'How fr Calculates': 'როგორ ითვლის fr',
+        'fr vs %': 'fr vs %',
+        'Grid Lines': 'Grid ხაზები',
+        'Line Placement': 'ხაზით განთავსება',
+        'Negative Line Numbers': 'უარყოფითი ხაზის ნომრები',
+        'Memorize This': 'დაიმახსოვრე ეს',
+        'The span Keyword': 'span საკვანძო სიტყვა',
+        'Spanning Grid Items': 'გაშლილი Grid ელემენტები',
+        'Naming Areas': 'არეების დასახელება',
+        'Named Grid Areas': 'დასახელებული Grid არეები',
+        'Empty Cells': 'ცარიელი უჯრები',
+        'Why Use Areas?': 'რატომ გამოვიყენოთ არეები?',
+        'Naming Grid Lines': 'Grid ხაზების დასახელება',
+        'Named Lines': 'დასახელებული ხაზები',
+        'When to Use Named Lines': 'როდის გამოვიყენოთ დასახელებული ხაზები',
+        'justify-items': 'justify-items',
+        'Justify Items': 'Justify Items',
+        'align-items': 'align-items',
+        'Align Items': 'Align Items',
+        'place-items': 'place-items',
+        'Place Items': 'Place Items',
+        'Place Items — Perfect Centering': 'Place Items — იდეალური ცენტრირება',
+        'The Easiest Centering Trick': 'ყველაზე მარტივი ცენტრირების ხრიკი',
+        'justify-content': 'justify-content',
+        'Justify Content': 'Justify Content',
+        'When Does This Apply?': 'როდის მოქმედებს ეს?',
+        'align-content': 'align-content',
+        'Align Content': 'Align Content',
+        'auto-fill vs auto-fit': 'auto-fill vs auto-fit',
+        'The Difference': 'განსხვავება',
+        'Responsive Grid Magic': 'რესპონსიული Grid მაგია',
+        'The Holy Grail of Responsive Grids': 'რესპონსიული Grid-ების წმინდა გრაალი',
+        'The minmax() Function': 'minmax() ფუნქცია',
+        'minmax() in Action': 'minmax() მოქმედებაში',
+        'Special Keywords': 'სპეციალური საკვანძო სიტყვები',
+        'grid-auto-flow': 'grid-auto-flow',
+        'Auto Flow Direction': 'Auto Flow მიმართულება',
+        'dense is Amazing': 'dense საოცარია',
+        'What is Subgrid?': 'რა არის Subgrid?',
+        'Browser Support': 'ბრაუზერის მხარდაჭერა',
+        'When to Use Subgrid': 'როდის გამოვიყენოთ Subgrid',
+        'Your Mission': 'შენი მისია',
+        'Requirements:': 'მოთხოვნები:',
+        'repeat() Shorthand': 'repeat() შემოკლება',
+        // Tips and descriptions
+        'CSS Grid is a two-dimensional layout system designed specifically for the web.': 'CSS Grid არის ორგანზომილებიანი განლაგების სისტემა, რომელიც სპეციალურად ვებისთვის შეიქმნა.',
+        'Unlike Flexbox (which is one-dimensional), Grid lets you control both columns AND rows at the same time.': 'Flexbox-ისგან განსხვავებით (რომელიც ერთგანზომილებიანია), Grid გაძლევს საშუალებას აკონტროლო სვეტები და რიგები ერთდროულად.',
+        'Think of it like a spreadsheet — you define rows and columns, then place items exactly where you want them.': 'წარმოიდგინე როგორც ცხრილი — განსაზღვრავ რიგებსა და სვეტებს, შემდეგ ათავსებ ელემენტებს ზუსტად იქ, სადაც გინდა.',
+        'Best for one direction (row OR column). Great for navigation, card layouts, centering.': 'საუკეთესოა ერთი მიმართულებისთვის (რიგი ან სვეტი). შესანიშნავია ნავიგაციისთვის, ბარათების განლაგებისთვის, ცენტრირებისთვის.',
+        'Best for two directions (rows AND columns). Perfect for page layouts, complex component structures.': 'საუკეთესოა ორი მიმართულებისთვის (რიგები და სვეტები). იდეალურია გვერდის განლაგებისთვის, რთული კომპონენტების სტრუქტურებისთვის.',
+        "You don't have to choose one — they work beautifully together!": 'არ გჭირდება ერთის არჩევა — ისინი მშვენივრად მუშაობენ ერთად!',
+        'Use Grid for the overall page structure, and Flexbox for components inside grid cells.': 'გამოიყენე Grid გვერდის მთლიანი სტრუქტურისთვის, და Flexbox კომპონენტებისთვის Grid უჯრებში.',
+        'Change the grid to have 2 columns instead of 3. What happens?': 'შეცვალე Grid რომ ჰქონდეს 2 სვეტი 3-ის ნაცვლად. რა ხდება?',
+        'The items will now flow into 2 columns, creating 3 rows': 'ელემენტები ახლა 2 სვეტში განთავსდება, 3 რიგის შექმნით',
+        'To create a grid, simply apply': 'Grid-ის შესაქმნელად, უბრალოდ მიანიჭე',
+        'to a container element. All direct children automatically become grid items.': 'კონტეინერ ელემენტს. ყველა პირდაპირი შვილი ავტომატურად ხდება Grid ელემენტი.',
+        'Block-level grid container (takes full width)': 'ბლოკის დონის Grid კონტეინერი (იკავებს სრულ სიგანეს)',
+        'Inline-level grid container (shrinks to content)': 'ხაზშიდა Grid კონტეინერი (იკუმშება კონტენტზე)',
+        'items just stack vertically. The grid exists, but has no defined structure yet.': 'ელემენტები უბრალოდ ვერტიკალურად ეწყობა. Grid არსებობს, მაგრამ ჯერ არ აქვს განსაზღვრული სტრუქტურა.',
+        'Notice how the container shrinks to fit its content?': 'შეამჩნიე როგორ იკუმშება კონტეინერი კონტენტზე?',
+        'Grid tracks are the spaces between grid lines.': 'Grid ტრეკები არის სივრცეები Grid ხაზებს შორის.',
+        'defines column tracks': 'განსაზღვრავს სვეტების ტრეკებს',
+        'defines row tracks': 'განსაზღვრავს რიგების ტრეკებს',
+        'You can use any CSS length unit:': 'შეგიძლია გამოიყენო ნებისმიერი CSS სიგრძის ერთეული:',
+        'Instead of writing': 'ნაცვლად იმისა, რომ დაწერო',
+        'The': 'ეს',
+        'property adds space between grid tracks (rows and columns).': 'თვისება ამატებს სივრცეს Grid ტრეკებს შორის (რიგები და სვეტები).',
+        "It's the modern replacement for the older": 'ეს არის ძველის თანამედროვე შემცვლელი',
+        'Unlike margins, gap only creates space': 'მარჯინებისგან განსხვავებით, gap ქმნის სივრცეს მხოლოდ',
+        'between': 'შორის',
+        'items, never on the outer edges. This makes layouts much more predictable!': 'ელემენტებს, არასოდეს გარე კიდეებზე. ეს განლაგებებს ბევრად უფრო პროგნოზირებადს ხდის!',
+        'The': '',
+        'unit stands for "fraction".': 'ერთეული ნიშნავს "წილს".',
+        'It divides available space proportionally between tracks.': 'ის ყოფს ხელმისაწვდომ სივრცეს პროპორციულად ტრეკებს შორის.',
+        'Think of it like slicing a pizza —': 'წარმოიდგინე როგორც პიცის დაჭრა —',
+        'means "give the middle slice twice as much space".': 'ნიშნავს "მიეცი შუა ნაჭერს ორჯერ მეტი სივრცე".',
+        'Fixed sizes are allocated first (px, %, etc.)': 'ჯერ ფიქსირებული ზომები ნაწილდება (px, %, და ა.შ.)',
+        'Gaps are subtracted': 'Gap-ები გამოაკლდება',
+        'Remaining space is divided by total fr units': 'დარჩენილი სივრცე იყოფა fr ერთეულების ჯამზე',
+        'when you can — it automatically accounts for gaps, while percentages don\'t!': 'როცა შეგიძლია — ის ავტომატურად ითვალისწინებს gap-ებს, პროცენტები კი არა!',
+        'Create a "Holy Grail" layout: fixed 200px sidebar on the left, flexible content in the middle, fixed 150px sidebar on the right.': 'შექმენი "Holy Grail" განლაგება: ფიქსირებული 200px სვეტი მარცხნივ, მოქნილი კონტენტი შუაში, ფიქსირებული 150px სვეტი მარჯვნივ.',
+        'Every grid has invisible lines that separate tracks. Lines are numbered starting from 1.': 'ყველა Grid-ს აქვს უხილავი ხაზები, რომლებიც ყოფენ ტრეკებს. ხაზები დანომრილია 1-დან.',
+        'A 3-column grid has': '3-სვეტიან Grid-ს აქვს',
+        '4 column lines': '4 სვეტის ხაზი',
+        'You can count from the end using negative numbers.': 'შეგიძლია დათვალო ბოლოდან უარყოფითი რიცხვებით.',
+        'is the last line.': 'არის ბოლო ხაზი.',
+        'Lines are like fence posts, tracks are like fence panels.': 'ხაზები ჰგვანან ღობის ბოძებს, ტრეკები — ღობის პანელებს.',
+        'A 3-column grid has 3 panels (tracks) and 4 posts (lines).': '3-სვეტიან Grid-ს აქვს 3 პანელი (ტრეკი) და 4 ბოძი (ხაზი).',
+        'Instead of specifying exact end lines, use': 'ზუსტი დასასრულის ხაზების მითითების ნაცვლად, გამოიყენე',
+        'to cover a number of tracks.': 'ტრეკების რაოდენობის დასაფარად.',
+        'Use spanning for: featured cards, hero sections, sidebar layouts, image galleries with different-sized thumbnails.': 'გამოიყენე გაშლა: გამორჩეული ბარათებისთვის, hero სექციებისთვის, სვეტების განლაგებისთვის, სურათების გალერეებისთვის სხვადასხვა ზომის მინიატურებით.',
+        'Create a "bento box" layout where the first item spans 2 columns, and the 4th item spans 2 rows.': 'შექმენი "bento box" განლაგება, სადაც პირველი ელემენტი ფარავს 2 სვეტს, ხოლო მე-4 ელემენტი — 2 რიგს.',
+        'Instead of line numbers, you can name areas and place items by name. Much more readable!': 'ხაზის ნომრების ნაცვლად, შეგიძლია დაასახელო არეები და განათავსო ელემენტები სახელით. ბევრად უფრო წაკითხვადია!',
+        'Use a dot': 'გამოიყენე წერტილი',
+        'to leave cells empty:': 'უჯრების ცარიელად დასატოვებლად:',
+        'Grid areas make responsive layouts trivial — just redefine': 'Grid არეები რესპონსიულ განლაგებებს ტრივიალურს ხდის — უბრალოდ ხელახლა განსაზღვრე',
+        'in a media query!': 'media query-ში!',
+        'You can name lines using square brackets in your template definitions:': 'შეგიძლია დაასახელო ხაზები კვადრატულ ფრჩხილებში შაბლონის განსაზღვრისას:',
+        'Named lines shine in complex layouts where you reference the same lines repeatedly.': 'დასახელებული ხაზები ბრწყინავენ რთულ განლაგებებში, სადაც ერთსა და იმავე ხაზებს მრავალჯერ მიმართავ.',
+        "They're also great for component libraries.": 'ისინი ასევე შესანიშნავია კომპონენტების ბიბლიოთეკებისთვის.',
+        'Controls how items are aligned along the inline (horizontal) axis within their cells.': 'აკონტროლებს როგორ არის გასწორებული ელემენტები inline (ჰორიზონტალურ) ღერძზე მათ უჯრებში.',
+        'Controls how items are aligned along the block (vertical) axis within their cells.': 'აკონტროლებს როგორ არის გასწორებული ელემენტები block (ვერტიკალურ) ღერძზე მათ უჯრებში.',
+        'Combines': 'აერთიანებს',
+        'and': 'და',
+        'into one shorthand.': 'ერთ შემოკლებულ ფორმაში.',
+        'This is the fastest way to center anything in CSS:': 'ეს არის ყველაზე სწრაფი გზა ნებისმიერის დაცენტრებისთვის CSS-ში:',
+        "When your grid tracks don't fill the entire container, this property controls how the grid itself is positioned horizontally.": 'როცა Grid ტრეკები არ ავსებენ მთელ კონტეინერს, ეს თვისება აკონტროლებს როგორ არის განთავსებული თავად Grid ჰორიზონტალურად.',
+        "only has an effect when your grid tracks (columns) don't fill the entire container width.": '-ს ეფექტი აქვს მხოლოდ მაშინ, როცა Grid ტრეკები (სვეტები) არ ავსებენ კონტეინერის მთელ სიგანეს.',
+        'Use fixed sizes or max-content to see it work.': 'გამოიყენე ფიქსირებული ზომები ან max-content სანახავად.',
+        "When your grid tracks don't fill the entire container vertically, this property controls how the grid itself is positioned.": 'როცა Grid ტრეკები არ ავსებენ მთელ კონტეინერს ვერტიკალურად, ეს თვისება აკონტროლებს როგორ არის განთავსებული თავად Grid.',
+        'These keywords create dynamic column counts based on available space.': 'ეს საკვანძო სიტყვები ქმნიან დინამიურ სვეტების რაოდენობას ხელმისაწვდომი სივრცის მიხედვით.',
+        'Creates as many tracks as possible, even if empty': 'ქმნის რაც შეიძლება მეტ ტრეკს, თუნდაც ცარიელს',
+        'Creates tracks, but collapses empty ones to 0': 'ქმნის ტრეკებს, მაგრამ აკეცავს ცარიელებს 0-მდე',
+        'In most cases, you want': 'უმეტეს შემთხვევაში, გინდა',
+        'with': '-თან ერთად',
+        'This single line creates a fully responsive grid with no media queries!': 'ეს ერთი ხაზი ქმნის სრულად რესპონსიულ Grid-ს media query-ების გარეშე!',
+        'Creates a size range that adapts based on available space.': 'ქმნის ზომის დიაპაზონს, რომელიც ადაპტირდება ხელმისაწვდომი სივრცის მიხედვით.',
+        'Smallest size without overflow': 'ყველაზე პატარა ზომა გადავსების გარეშე',
+        'Ideal size for content': 'იდეალური ზომა კონტენტისთვის',
+        'Adapts to content': 'ადაპტირდება კონტენტზე',
+        "Controls the direction items flow when they're not explicitly placed.": 'აკონტროლებს მიმართულებას, რომლითაც მიედინება ელემენტები, როცა ისინი ცხადად არ არის განთავსებული.',
+        'Add': 'დაამატე',
+        "to fill gaps when items are different sizes. Perfect for masonry-like layouts!": 'ხარვეზების შესავსებად, როცა ელემენტები სხვადასხვა ზომისაა. იდეალურია masonry-ს მსგავსი განლაგებებისთვის!',
+        "Subgrid lets a grid item's children align to the parent grid's tracks instead of creating a new independent grid.": 'Subgrid საშუალებას აძლევს Grid ელემენტის შვილებს გასწორდნენ მშობელი Grid-ის ტრეკებთან, ახალი დამოუკიდებელი Grid-ის შექმნის ნაცვლად.',
+        'Subgrid has good support in modern browsers. Check caniuse.com for current status.': 'Subgrid-ს კარგი მხარდაჭერა აქვს თანამედროვე ბრაუზერებში. შეამოწმე caniuse.com მიმდინარე სტატუსისთვის.',
+        "Subgrid is perfect for: card layouts where content needs to align, forms with aligned labels, and any nested content that should respect the parent's grid.": 'Subgrid იდეალურია: ბარათების განლაგებებისთვის, სადაც კონტენტი უნდა იყოს გასწორებული, ფორმებისთვის გასწორებული ლეიბლებით, და ნებისმიერი ჩადგმული კონტენტისთვის, რომელმაც უნდა დაიცვას მშობლის Grid.',
+        "Create a classic page layout with header, footer, main content, and two sidebars using CSS Grid.": 'შექმენი კლასიკური გვერდის განლაგება header-ით, footer-ით, მთავარი კონტენტით და ორი სვეტით CSS Grid-ის გამოყენებით.',
+        'Header spans the full width': 'Header ფარავს სრულ სიგანეს',
+        'Footer spans the full width': 'Footer ფარავს სრულ სიგანეს',
+        'Left sidebar is 200px wide': 'მარცხენა სვეტი არის 200px სიგანის',
+        'Right sidebar is 150px wide': 'მარჯვენა სვეტი არის 150px სიგანის',
+        'Main content fills the remaining space': 'მთავარი კონტენტი ავსებს დარჩენილ სივრცეს',
+        'Build a card grid that automatically adjusts the number of columns based on available space.': 'ააგე ბარათების Grid, რომელიც ავტომატურად არეგულირებს სვეტების რაოდენობას ხელმისაწვდომი სივრცის მიხედვით.',
+        'Cards should be at least 250px wide': 'ბარათები უნდა იყოს მინიმუმ 250px სიგანის',
+        'Cards should grow to fill available space': 'ბარათები უნდა იზრდებოდეს ხელმისაწვდომი სივრცის შესავსებად',
+        'Use 20px gap between cards': 'გამოიყენე 20px დაშორება ბარათებს შორის',
+        'No media queries needed!': 'media query-ები არ არის საჭირო!',
+        'Create a modern dashboard layout with a fixed sidebar, header, and flexible widget area.': 'შექმენი თანამედროვე dashboard განლაგება ფიქსირებული სვეტით, header-ით და მოქნილი ვიჯეტების არეით.',
+        'Previous': 'წინა',
+        'Next': 'შემდეგი',
+        '(resize browser to see magic!)': '(შეცვალე ბრაუზერის ზომა მაგიის სანახავად!)'
+    };
+    
+    // Apply translations
+    for (const [en, ka] of Object.entries(translations)) {
+        // Escape special regex characters in the English string
+        const escaped = en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        content = content.replace(new RegExp(escaped, 'g'), ka);
+    }
+    
+    return content;
+}
 
 // Load a lesson
 function loadLesson(lessonId) {
@@ -42,30 +263,37 @@ function loadLesson(lessonId) {
     const prevLesson = currentIndex > 0 ? lessonOrder[currentIndex - 1] : null;
     const nextLesson = currentIndex < lessonOrder.length - 1 ? lessonOrder[currentIndex + 1] : null;
     
+    // Get localized content
+    const title = getLocalizedLessonText(lessonId, 'title');
+    const subtitle = getLocalizedLessonText(lessonId, 'subtitle');
+    const content = getLocalizedLessonContent(lessonId);
+    const prevText = window.i18n?.tc('ui.previous') || 'Previous';
+    const nextText = window.i18n?.tc('ui.next') || 'Next';
+    
     container.innerHTML = `
         <div class="lesson">
             <div class="lesson-header">
-                <h1>${lesson.title}</h1>
-                <p class="subtitle">${lesson.subtitle}</p>
+                <h1>${title}</h1>
+                <p class="subtitle">${subtitle}</p>
             </div>
             <div class="lesson-content">
-                ${lesson.content}
+                ${content}
             </div>
             <div class="lesson-nav">
                 ${prevLesson ? `
                     <button class="lesson-nav-btn" onclick="navigateTo('${prevLesson}')">
                         <span>←</span>
                         <div>
-                            <div class="direction">Previous</div>
-                            <div class="title">${lessons[prevLesson].title}</div>
+                            <div class="direction">${prevText}</div>
+                            <div class="title">${getLocalizedLessonText(prevLesson, 'title')}</div>
                         </div>
                     </button>
                 ` : '<div></div>'}
                 ${nextLesson ? `
                     <button class="lesson-nav-btn" onclick="navigateTo('${nextLesson}')">
                         <div>
-                            <div class="direction">Next</div>
-                            <div class="title">${lessons[nextLesson].title}</div>
+                            <div class="direction">${nextText}</div>
+                            <div class="title">${getLocalizedLessonText(nextLesson, 'title')}</div>
                         </div>
                         <span>→</span>
                     </button>

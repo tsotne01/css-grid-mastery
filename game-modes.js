@@ -51,6 +51,43 @@ function backToLessons() {
     currentChallenge = null;
 }
 
+// ============== LOCALIZATION HELPERS ==============
+function getGameText(path, fallback = '') {
+    if (window.i18n && window.CONTENT_TRANSLATIONS) {
+        const keys = path.split('.');
+        let value = window.CONTENT_TRANSLATIONS;
+        for (const key of keys) {
+            if (value && value[key] !== undefined) {
+                value = value[key];
+            } else {
+                return fallback || path;
+            }
+        }
+        if (value && typeof value === 'object' && (value.en !== undefined || value.ka !== undefined)) {
+            return value[window.i18n.currentLang] || value.en || fallback;
+        }
+        return value || fallback;
+    }
+    return fallback || path;
+}
+
+function getChallengeName(id) {
+    return getGameText(`challenges.${id}.name`, GRID_BATTLE_CHALLENGES.find(c => c.id === id)?.name || `Challenge ${id}`);
+}
+
+function getChallengeDesc(id) {
+    return getGameText(`challenges.${id}.description`, GRID_BATTLE_CHALLENGES.find(c => c.id === id)?.description || '');
+}
+
+function getChallengeHints(id) {
+    const challenge = GRID_BATTLE_CHALLENGES.find(c => c.id === id);
+    const hints = window.CONTENT_TRANSLATIONS?.challenges?.[id]?.hints;
+    if (hints && window.i18n) {
+        return hints.map(h => h[window.i18n.currentLang] || h.en || h);
+    }
+    return challenge?.hints || [];
+}
+
 // ============== GRID BATTLE ==============
 let currentBattleCategory = 'all';
 
@@ -58,12 +95,13 @@ function renderGridBattleMenu() {
     gameState.recordGameMode('gridBattle');
     const container = document.getElementById('game-container');
     
+    // Localized categories
     const categories = [
-        { id: 'all', name: 'All Challenges', emoji: '📋' },
-        { id: 'basic', name: 'Basic (1-10)', emoji: '🌱' },
-        { id: 'responsive', name: 'Responsive', emoji: '📱' },
-        { id: 'speed', name: 'Speed Run', emoji: '⚡' },
-        { id: 'advanced', name: 'Advanced', emoji: '🔥' }
+        { id: 'all', name: getGameText('gameModes.gridBattle.categories.all', 'All Challenges'), emoji: '📋' },
+        { id: 'basic', name: getGameText('gameModes.gridBattle.categories.basic', 'Basic (1-10)'), emoji: '🌱' },
+        { id: 'responsive', name: getGameText('gameModes.gridBattle.categories.responsive', 'Responsive'), emoji: '📱' },
+        { id: 'speed', name: getGameText('gameModes.gridBattle.categories.speed', 'Speed Run'), emoji: '⚡' },
+        { id: 'advanced', name: getGameText('gameModes.gridBattle.categories.advanced', 'Advanced'), emoji: '🔥' }
     ];
     
     const filteredChallenges = GRID_BATTLE_CHALLENGES.filter(c => {
@@ -75,23 +113,33 @@ function renderGridBattleMenu() {
     const completedCount = (gameState.gridBattleStats.completed || []).length;
     const totalCount = GRID_BATTLE_CHALLENGES.length;
     
+    // Localized strings
+    const title = getGameText('gameModes.gridBattle.title', 'Grid Battle');
+    const backText = getGameText('gameModes.gridBattle.backToLessons', 'Back to Lessons');
+    const subtitle = getGameText('gameModes.gridBattle.subtitle', 'Time Attack Mode');
+    const description = getGameText('gameModes.gridBattle.description', 'Race against the clock to recreate CSS Grid layouts. The faster and more accurate you are, the higher your score!');
+    const speedBonus = getGameText('gameModes.gridBattle.speedBonus', 'Speed Bonus');
+    const accuracyPoints = getGameText('gameModes.gridBattle.accuracyPoints', 'Accuracy Points');
+    const perfectBonus = getGameText('gameModes.gridBattle.perfectBonus', 'Perfect Bonus');
+    const challengesCompleted = getGameText('gameModes.gridBattle.challengesCompleted', 'challenges completed');
+    
     container.innerHTML = `
         <div class="game-container">
             <div class="game-header">
-                <h1>⚔️ Grid Battle</h1>
-                <button class="game-btn secondary" onclick="backToLessons()">← Back to Lessons</button>
+                <h1>⚔️ ${title}</h1>
+                <button class="game-btn secondary" onclick="backToLessons()">← ${backText}</button>
             </div>
             
             <div class="challenge-card">
-                <h2>Time Attack Mode</h2>
-                <p class="description">Race against the clock to recreate CSS Grid layouts. The faster and more accurate you are, the higher your score!</p>
+                <h2>${subtitle}</h2>
+                <p class="description">${description}</p>
                 <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
-                    <span class="difficulty difficulty-1">⚡ Speed Bonus</span>
-                    <span class="difficulty difficulty-2">🎯 Accuracy Points</span>
-                    <span class="difficulty difficulty-3">💯 Perfect Bonus</span>
+                    <span class="difficulty difficulty-1">⚡ ${speedBonus}</span>
+                    <span class="difficulty difficulty-2">🎯 ${accuracyPoints}</span>
+                    <span class="difficulty difficulty-3">💯 ${perfectBonus}</span>
                 </div>
                 <div style="margin-top: 16px;">
-                    <strong>${completedCount}/${totalCount}</strong> challenges completed
+                    <strong>${completedCount}/${totalCount}</strong> ${challengesCompleted}
                 </div>
             </div>
             
@@ -109,7 +157,7 @@ function renderGridBattleMenu() {
                     <div class="challenge-list-item ${gameState.gridBattleStats.completed?.includes(c.id) ? 'completed' : ''}" 
                          onclick="startGridBattle(${c.id})">
                         <div class="info">
-                            <span class="name">${c.name}</span>
+                            <span class="name">${getChallengeName(c.id)}</span>
                             <span class="meta">
                                 <span class="difficulty difficulty-${c.difficulty}">${'⭐'.repeat(c.difficulty)}</span>
                                 · ${c.timeLimit}s
@@ -136,21 +184,31 @@ function startGridBattle(challengeId) {
     currentChallenge = challenge;
     const container = document.getElementById('game-container');
     
+    // Localized strings
+    const challengeName = getChallengeName(challengeId);
+    const challengeDesc = getChallengeDesc(challengeId);
+    const yourMission = getGameText('gameModes.gridBattle.yourMission', 'Your Mission');
+    const difficulty = getGameText('ui.difficulty', 'Difficulty');
+    const targetLayout = getGameText('gameModes.gridBattle.targetLayout', 'Target Layout');
+    const yourCSS = getGameText('gameModes.gridBattle.yourCSS', 'Your CSS');
+    const hint = getGameText('gameModes.gridBattle.hint', 'Hint');
+    const yourResult = getGameText('gameModes.gridBattle.yourResult', 'Your Result');
+    
     container.innerHTML = `
         <div class="game-container">
             <div class="game-header">
-                <h1>⚔️ ${challenge.name}</h1>
+                <h1>⚔️ ${challengeName}</h1>
                 <div class="game-timer" id="battle-timer">${challenge.timeLimit}</div>
             </div>
             
             <div class="challenge-card">
-                <h2>Your Mission</h2>
-                <p class="description">${challenge.description}</p>
-                <span class="difficulty difficulty-${challenge.difficulty}">Difficulty: ${'⭐'.repeat(challenge.difficulty)}</span>
+                <h2>${yourMission}</h2>
+                <p class="description">${challengeDesc}</p>
+                <span class="difficulty difficulty-${challenge.difficulty}">${difficulty}: ${'⭐'.repeat(challenge.difficulty)}</span>
             </div>
             
             <div class="target-preview">
-                <h3>🎯 Target Layout</h3>
+                <h3>🎯 ${targetLayout}</h3>
                 <div class="grid-preview" id="target-preview">
                     <div class="preview-grid" style="${challenge.targetCSS.replace(/\n/g, ' ')}">
                         ${challenge.html}
@@ -161,9 +219,9 @@ function startGridBattle(challengeId) {
             <div class="game-editor">
                 <div class="code-panel">
                     <div class="panel-header">
-                        <h4>Your CSS</h4>
+                        <h4>${yourCSS}</h4>
                         <button class="hint-btn" onclick="showBattleHint()" id="hint-btn">
-                            💡 Hint (-10 pts)
+                            💡 ${hint} (-10 pts)
                         </button>
                     </div>
                     <textarea id="battle-code" placeholder=".container {
@@ -176,7 +234,7 @@ function startGridBattle(challengeId) {
                 </div>
                 <div class="preview-panel">
                     <div class="panel-header">
-                        <h4>Your Result</h4>
+                        <h4>${yourResult}</h4>
                     </div>
                     <div class="preview-content" id="battle-preview">
                         <div class="preview-grid" id="user-grid">
@@ -187,8 +245,8 @@ function startGridBattle(challengeId) {
             </div>
             
             <div class="game-actions">
-                <button class="game-btn secondary" onclick="renderGridBattleMenu()">← Back</button>
-                <button class="game-btn success" onclick="submitGridBattle()">✓ Submit Solution</button>
+                <button class="game-btn secondary" onclick="renderGridBattleMenu()">← ${getGameText('ui.back', 'Back')}</button>
+                <button class="game-btn success" onclick="submitGridBattle()">✓ ${getGameText('gameModes.gridBattle.submitSolution', 'Submit Solution')}</button>
             </div>
             
             <div id="hint-display" style="display: none;"></div>
@@ -266,8 +324,10 @@ function showBattleHint() {
     if (hintUsed || !currentChallenge) return;
     
     hintUsed = true;
-    const hintIndex = Math.floor(Math.random() * currentChallenge.hints.length);
-    const hint = currentChallenge.hints[hintIndex];
+    const hints = getChallengeHints(currentChallenge.id);
+    const hintIndex = Math.floor(Math.random() * hints.length);
+    const hint = hints[hintIndex];
+    const hintLabel = getGameText('gameModes.gridBattle.hint', 'Hint');
     
     const hintDisplay = document.getElementById('hint-display');
     hintDisplay.style.display = 'block';
@@ -275,7 +335,7 @@ function showBattleHint() {
         <div class="hint-display">
             <span class="hint-icon">💡</span>
             <div>
-                <strong>Hint:</strong>
+                <strong>${hintLabel}:</strong>
                 <p>${hint}</p>
             </div>
         </div>
@@ -324,28 +384,40 @@ function submitGridBattle() {
     
     gameState.save();
     
+    // Localized strings for results
+    const victoryText = getGameText('gameModes.gridBattle.victory', 'Victory!');
+    const tryAgainText = getGameText('gameModes.gridBattle.tryAgain', 'Try Again');
+    const totalScoreText = getGameText('gameModes.gridBattle.totalScore', 'Total Score');
+    const accuracyText = getGameText('gameModes.gridBattle.accuracy', 'Accuracy');
+    const timeBonusText = getGameText('gameModes.gridBattle.timeBonus', 'Time Bonus');
+    const perfectBonusText = getGameText('gameModes.gridBattle.perfectBonus', 'Perfect Bonus');
+    const missingText = getGameText('gameModes.gridBattle.missingOrIncorrect', 'Missing or Incorrect:');
+    const solutionText = getGameText('gameModes.gridBattle.solution', 'Solution:');
+    const backToChallengesText = getGameText('gameModes.gridBattle.backToChallenges', 'Back to Challenges');
+    const nextChallengeText = getGameText('gameModes.gridBattle.nextChallenge', 'Next Challenge');
+    
     // Show results
     const container = document.getElementById('game-container');
     container.innerHTML = `
         <div class="game-container">
             <div class="game-header">
-                <h1>${result.accuracy >= 80 ? '🎉 Victory!' : '😅 Try Again'}</h1>
+                <h1>${result.accuracy >= 80 ? '🎉 ' + victoryText : '😅 ' + tryAgainText}</h1>
             </div>
             
             <div class="score-display">
                 <div class="score-value">${score.total}</div>
-                <p style="color: var(--text-secondary);">Total Score</p>
+                <p style="color: var(--text-secondary);">${totalScoreText}</p>
                 <div class="score-breakdown">
                     <div class="score-item">
-                        <div class="label">Accuracy</div>
+                        <div class="label">${accuracyText}</div>
                         <div class="value">${result.accuracy}%</div>
                     </div>
                     <div class="score-item">
-                        <div class="label">Time Bonus</div>
+                        <div class="label">${timeBonusText}</div>
                         <div class="value">+${score.timeBonus}</div>
                     </div>
                     <div class="score-item">
-                        <div class="label">Perfect Bonus</div>
+                        <div class="label">${perfectBonusText}</div>
                         <div class="value">+${score.perfectBonus}</div>
                     </div>
                 </div>
@@ -353,7 +425,7 @@ function submitGridBattle() {
             
             ${result.missing.length > 0 ? `
                 <div class="challenge-card">
-                    <h3>Missing or Incorrect:</h3>
+                    <h3>${missingText}</h3>
                     <ul style="margin-top: 12px; color: var(--text-secondary);">
                         ${result.missing.map(m => `<li><code>${m}</code></li>`).join('')}
                     </ul>
@@ -361,15 +433,15 @@ function submitGridBattle() {
             ` : ''}
             
             <div class="challenge-card">
-                <h3>Solution:</h3>
+                <h3>${solutionText}</h3>
                 <pre style="margin-top: 12px; background: var(--bg-dark); padding: 16px; border-radius: 8px; overflow-x: auto;"><code>${currentChallenge.targetCSS}</code></pre>
             </div>
             
             <div class="game-actions">
-                <button class="game-btn secondary" onclick="renderGridBattleMenu()">← Back to Challenges</button>
-                <button class="game-btn primary" onclick="startGridBattle(${currentChallenge.id})">🔄 Try Again</button>
+                <button class="game-btn secondary" onclick="renderGridBattleMenu()">← ${backToChallengesText}</button>
+                <button class="game-btn primary" onclick="startGridBattle(${currentChallenge.id})">🔄 ${tryAgainText}</button>
                 ${currentChallenge.id < GRID_BATTLE_CHALLENGES.length ? `
-                    <button class="game-btn success" onclick="startGridBattle(${currentChallenge.id + 1})">Next Challenge →</button>
+                    <button class="game-btn success" onclick="startGridBattle(${currentChallenge.id + 1})">${nextChallengeText} →</button>
                 ` : ''}
             </div>
         </div>
@@ -379,24 +451,49 @@ function submitGridBattle() {
 }
 
 // ============== DEBUG DETECTIVE ==============
+function getDebugChallengeName(id) {
+    return getGameText(`debugChallenges.${id}.name`, DEBUG_CHALLENGES.find(c => c.id === id)?.name || `Bug ${id}`);
+}
+
+function getDebugChallengeDesc(id) {
+    return getGameText(`debugChallenges.${id}.description`, DEBUG_CHALLENGES.find(c => c.id === id)?.description || '');
+}
+
+function getDebugChallengeHint(id) {
+    return getGameText(`debugChallenges.${id}.hint`, DEBUG_CHALLENGES.find(c => c.id === id)?.hint || '');
+}
+
+function getDebugChallengeExplanation(id) {
+    return getGameText(`debugChallenges.${id}.explanation`, DEBUG_CHALLENGES.find(c => c.id === id)?.explanation || '');
+}
+
 function renderDebugDetectiveMenu() {
     gameState.recordGameMode('debugDetective');
     const container = document.getElementById('game-container');
     
+    // Localized strings
+    const title = getGameText('gameModes.debugDetective.title', 'Debug Detective');
+    const backText = getGameText('ui.backToLessons', 'Back to Lessons');
+    const subtitle = getGameText('gameModes.debugDetective.subtitle', 'Find and Fix the Bug');
+    const description = getGameText('gameModes.debugDetective.description', 'Each challenge contains broken CSS. Find the bug, fix it, and learn from common mistakes!');
+    const bugIdentification = getGameText('gameModes.debugDetective.bugIdentification', 'Bug Identification');
+    const quickFix = getGameText('gameModes.debugDetective.quickFix', 'Quick Fix');
+    const hintsAvailable = getGameText('gameModes.debugDetective.hintsAvailable', 'Hints Available');
+    
     container.innerHTML = `
         <div class="game-container">
             <div class="game-header">
-                <h1>🔍 Debug Detective</h1>
-                <button class="game-btn secondary" onclick="backToLessons()">← Back to Lessons</button>
+                <h1>🔍 ${title}</h1>
+                <button class="game-btn secondary" onclick="backToLessons()">← ${backText}</button>
             </div>
             
             <div class="challenge-card">
-                <h2>Find and Fix the Bug</h2>
-                <p class="description">Each challenge contains broken CSS. Find the bug, fix it, and learn from common mistakes!</p>
+                <h2>${subtitle}</h2>
+                <p class="description">${description}</p>
                 <div style="display: flex; gap: 12px; margin-top: 16px;">
-                    <span class="difficulty difficulty-1">🐛 Bug Identification</span>
-                    <span class="difficulty difficulty-2">🔧 Quick Fix</span>
-                    <span class="difficulty difficulty-3">💡 Hints Available</span>
+                    <span class="difficulty difficulty-1">🐛 ${bugIdentification}</span>
+                    <span class="difficulty difficulty-2">🔧 ${quickFix}</span>
+                    <span class="difficulty difficulty-3">💡 ${hintsAvailable}</span>
                 </div>
             </div>
             
@@ -406,10 +503,10 @@ function renderDebugDetectiveMenu() {
                     <div class="challenge-list-item ${gameState.debugStats.completed?.includes(c.id) ? 'completed' : ''}" 
                          onclick="startDebugChallenge(${c.id})">
                         <div class="info">
-                            <span class="name">${c.name}</span>
+                            <span class="name">${getDebugChallengeName(c.id)}</span>
                             <span class="meta">
                                 <span class="difficulty difficulty-${c.difficulty}">${'⭐'.repeat(c.difficulty)}</span>
-                                · ${c.description}
+                                · ${getDebugChallengeDesc(c.id)}
                             </span>
                         </div>
                     </div>
@@ -427,25 +524,35 @@ function startDebugChallenge(challengeId) {
     currentChallenge = challenge;
     debugHintsUsed = 0;
     
+    // Localized strings
+    const challengeName = getDebugChallengeName(challengeId);
+    const challengeDesc = getDebugChallengeDesc(challengeId);
+    const difficulty = getGameText('ui.difficulty', 'Difficulty');
+    const theBug = getGameText('gameModes.debugDetective.theBug', 'The Bug');
+    const fixTheCSS = getGameText('gameModes.debugDetective.fixTheCSS', 'Fix the CSS');
+    const showHint = getGameText('gameModes.debugDetective.showHint', 'Show Hint');
+    const back = getGameText('ui.back', 'Back');
+    const submitFix = getGameText('gameModes.debugDetective.submitFix', 'Submit Fix');
+    
     const container = document.getElementById('game-container');
     container.innerHTML = `
         <div class="game-container">
             <div class="game-header">
-                <h1>🔍 ${challenge.name}</h1>
-                <span class="difficulty difficulty-${challenge.difficulty}">Difficulty: ${'⭐'.repeat(challenge.difficulty)}</span>
+                <h1>🔍 ${challengeName}</h1>
+                <span class="difficulty difficulty-${challenge.difficulty}">${difficulty}: ${'⭐'.repeat(challenge.difficulty)}</span>
             </div>
             
             <div class="challenge-card">
-                <h2>🐛 The Bug</h2>
-                <p class="description">${challenge.description}</p>
+                <h2>🐛 ${theBug}</h2>
+                <p class="description">${challengeDesc}</p>
             </div>
             
             <div class="game-editor">
                 <div class="code-panel" style="grid-column: span 2;">
                     <div class="panel-header">
-                        <h4>Fix the CSS</h4>
+                        <h4>${fixTheCSS}</h4>
                         <button class="hint-btn" onclick="showDebugHint()" id="debug-hint-btn">
-                            💡 Show Hint (-20 pts)
+                            💡 ${showHint} (-20 pts)
                         </button>
                     </div>
                     <textarea id="debug-code" style="min-height: 300px;">${challenge.buggyCSS}</textarea>
@@ -455,8 +562,8 @@ function startDebugChallenge(challengeId) {
             <div id="debug-hint-display" style="display: none;"></div>
             
             <div class="game-actions">
-                <button class="game-btn secondary" onclick="renderDebugDetectiveMenu()">← Back</button>
-                <button class="game-btn success" onclick="submitDebugSolution()">✓ Submit Fix</button>
+                <button class="game-btn secondary" onclick="renderDebugDetectiveMenu()">← ${back}</button>
+                <button class="game-btn success" onclick="submitDebugSolution()">✓ ${submitFix}</button>
             </div>
         </div>
     `;
@@ -468,14 +575,17 @@ function showDebugHint() {
     debugHintsUsed++;
     gameState.debugStats.hintsUsed++;
     
+    const hintLabel = getGameText('gameModes.gridBattle.hint', 'Hint');
+    const hintText = getDebugChallengeHint(currentChallenge.id);
+    
     const hintDisplay = document.getElementById('debug-hint-display');
     hintDisplay.style.display = 'block';
     hintDisplay.innerHTML = `
         <div class="hint-display">
             <span class="hint-icon">💡</span>
             <div>
-                <strong>Hint:</strong>
-                <p>${currentChallenge.hint}</p>
+                <strong>${hintLabel}:</strong>
+                <p>${hintText}</p>
             </div>
         </div>
     `;
@@ -493,13 +603,27 @@ function submitDebugSolution() {
     
     const container = document.getElementById('game-container');
     
+    // Localized strings
+    const bugFixed = getGameText('gameModes.debugDetective.bugFixed', 'Bug Fixed!');
+    const greatWork = getGameText('gameModes.debugDetective.greatWork', 'Great detective work!');
+    const lessonLearned = getGameText('gameModes.debugDetective.lessonLearned', 'Lesson Learned:');
+    const moreChallenges = getGameText('gameModes.debugDetective.moreChallenges', 'More Challenges');
+    const nextBug = getGameText('gameModes.debugDetective.nextBug', 'Next Bug');
+    const notQuiteRight = getGameText('gameModes.debugDetective.notQuiteRight', 'Not Quite Right');
+    const yourCode = getGameText('gameModes.debugDetective.yourCode', 'Your Code:');
+    const expectedFix = getGameText('gameModes.debugDetective.expectedFix', 'Expected Fix:');
+    const explanation = getGameText('gameModes.debugDetective.explanation', 'Explanation:');
+    const back = getGameText('ui.back', 'Back');
+    const tryAgain = getGameText('ui.tryAgain', 'Try Again');
+    const explanationText = getDebugChallengeExplanation(currentChallenge.id);
+    
     if (isCorrect) {
         // Mark as completed
         if (!gameState.debugStats.completed) gameState.debugStats.completed = [];
         if (!gameState.debugStats.completed.includes(currentChallenge.id)) {
             gameState.debugStats.completed.push(currentChallenge.id);
             const xpEarned = Math.max(10, XP_REWARDS.debugFixed - (debugHintsUsed * 20));
-            gameState.addXP(xpEarned, 'Bug Fixed!');
+            gameState.addXP(xpEarned, bugFixed);
         }
         
         // Check achievements
@@ -515,23 +639,23 @@ function submitDebugSolution() {
         container.innerHTML = `
             <div class="game-container">
                 <div class="game-header">
-                    <h1>🎉 Bug Fixed!</h1>
+                    <h1>🎉 ${bugFixed}</h1>
                 </div>
                 
                 <div class="score-display">
                     <div class="score-value">✓</div>
-                    <p style="color: var(--success);">Great detective work!</p>
+                    <p style="color: var(--success);">${greatWork}</p>
                 </div>
                 
                 <div class="challenge-card">
-                    <h3>📚 Lesson Learned:</h3>
-                    <p style="margin-top: 12px;">${currentChallenge.explanation}</p>
+                    <h3>📚 ${lessonLearned}</h3>
+                    <p style="margin-top: 12px;">${explanationText}</p>
                 </div>
                 
                 <div class="game-actions">
-                    <button class="game-btn secondary" onclick="renderDebugDetectiveMenu()">← More Challenges</button>
+                    <button class="game-btn secondary" onclick="renderDebugDetectiveMenu()">← ${moreChallenges}</button>
                     ${currentChallenge.id < DEBUG_CHALLENGES.length ? `
-                        <button class="game-btn primary" onclick="startDebugChallenge(${currentChallenge.id + 1})">Next Bug →</button>
+                        <button class="game-btn primary" onclick="startDebugChallenge(${currentChallenge.id + 1})">${nextBug} →</button>
                     ` : ''}
                 </div>
             </div>
@@ -540,27 +664,27 @@ function submitDebugSolution() {
         container.innerHTML = `
             <div class="game-container">
                 <div class="game-header">
-                    <h1>🤔 Not Quite Right</h1>
+                    <h1>🤔 ${notQuiteRight}</h1>
                 </div>
                 
                 <div class="challenge-card">
-                    <h3>Your Code:</h3>
+                    <h3>${yourCode}</h3>
                     <pre style="margin-top: 12px; background: var(--bg-dark); padding: 16px; border-radius: 8px;">${userCode}</pre>
                 </div>
                 
                 <div class="challenge-card">
-                    <h3>Expected Fix:</h3>
+                    <h3>${expectedFix}</h3>
                     <pre style="margin-top: 12px; background: var(--bg-dark); padding: 16px; border-radius: 8px;">${currentChallenge.fixedCSS}</pre>
                 </div>
                 
                 <div class="challenge-card">
-                    <h3>📚 Explanation:</h3>
-                    <p style="margin-top: 12px;">${currentChallenge.explanation}</p>
+                    <h3>📚 ${explanation}</h3>
+                    <p style="margin-top: 12px;">${explanationText}</p>
                 </div>
                 
                 <div class="game-actions">
-                    <button class="game-btn secondary" onclick="renderDebugDetectiveMenu()">← Back</button>
-                    <button class="game-btn primary" onclick="startDebugChallenge(${currentChallenge.id})">🔄 Try Again</button>
+                    <button class="game-btn secondary" onclick="renderDebugDetectiveMenu()">← ${back}</button>
+                    <button class="game-btn primary" onclick="startDebugChallenge(${currentChallenge.id})">🔄 ${tryAgain}</button>
                 </div>
             </div>
         `;
@@ -568,32 +692,47 @@ function submitDebugSolution() {
 }
 
 // ============== CLONE CHALLENGE ==============
+function getCloneChallengeName(id) {
+    return getGameText(`cloneChallenges.${id}.name`, CLONE_CHALLENGES.find(c => c.id === id)?.name || `Clone ${id}`);
+}
+
+function getCloneChallengeDesc(id) {
+    return getGameText(`cloneChallenges.${id}.description`, CLONE_CHALLENGES.find(c => c.id === id)?.description || '');
+}
+
 function renderCloneChallengeMenu() {
     gameState.recordGameMode('cloneChallenge');
     const container = document.getElementById('game-container');
     
+    // Localized strings
+    const title = getGameText('gameModes.cloneChallenge.title', 'Clone Challenge');
+    const backText = getGameText('ui.backToLessons', 'Back to Lessons');
+    const subtitle = getGameText('gameModes.cloneChallenge.subtitle', 'Recreate Real Layouts');
+    const description = getGameText('gameModes.cloneChallenge.description', 'Clone famous website layouts using CSS Grid. Match the reference as closely as possible!');
+    const websiteChallenges = getGameText('gameModes.cloneChallenge.websiteChallenges', 'Website Challenges');
+    
     container.innerHTML = `
         <div class="game-container">
             <div class="game-header">
-                <h1>🎨 Clone Challenge</h1>
-                <button class="game-btn secondary" onclick="backToLessons()">← Back to Lessons</button>
+                <h1>🎨 ${title}</h1>
+                <button class="game-btn secondary" onclick="backToLessons()">← ${backText}</button>
             </div>
             
             <div class="challenge-card">
-                <h2>Recreate Real Layouts</h2>
-                <p class="description">Clone famous website layouts using CSS Grid. Match the reference as closely as possible!</p>
+                <h2>${subtitle}</h2>
+                <p class="description">${description}</p>
             </div>
             
-            <h3 style="margin-bottom: 16px;">Website Challenges</h3>
+            <h3 style="margin-bottom: 16px;">${websiteChallenges}</h3>
             <div class="challenge-list">
                 ${CLONE_CHALLENGES.map(c => `
                     <div class="challenge-list-item ${gameState.cloneStats.completed?.includes(c.id) ? 'completed' : ''}" 
                          onclick="startCloneChallenge('${c.id}')">
                         <div class="info">
-                            <span class="name">${c.name}</span>
+                            <span class="name">${getCloneChallengeName(c.id)}</span>
                             <span class="meta">
                                 <span class="difficulty difficulty-${c.difficulty}">${'⭐'.repeat(c.difficulty)}</span>
-                                · ${c.description}
+                                · ${getCloneChallengeDesc(c.id)}
                             </span>
                         </div>
                     </div>
@@ -609,20 +748,30 @@ function startCloneChallenge(challengeId) {
     
     currentChallenge = challenge;
     
+    // Localized strings
+    const challengeName = getCloneChallengeName(challengeId);
+    const challengeDesc = getCloneChallengeDesc(challengeId);
+    const referenceLayout = getGameText('gameModes.cloneChallenge.referenceLayout', 'Reference Layout');
+    const yourCSS = getGameText('gameModes.gridBattle.yourCSS', 'Your CSS');
+    const yourResult = getGameText('gameModes.gridBattle.yourResult', 'Your Result');
+    const back = getGameText('ui.back', 'Back');
+    const showSolution = getGameText('gameModes.cloneChallenge.showSolution', 'Show Solution');
+    const submit = getGameText('ui.submit', 'Submit');
+    
     const container = document.getElementById('game-container');
     container.innerHTML = `
         <div class="game-container">
             <div class="game-header">
-                <h1>🎨 ${challenge.name}</h1>
+                <h1>🎨 ${challengeName}</h1>
                 <span class="difficulty difficulty-${challenge.difficulty}">${'⭐'.repeat(challenge.difficulty)}</span>
             </div>
             
             <div class="challenge-card">
-                <p class="description">${challenge.description}</p>
+                <p class="description">${challengeDesc}</p>
             </div>
             
             <div class="clone-reference">
-                <h3>🎯 Reference Layout</h3>
+                <h3>🎯 ${referenceLayout}</h3>
                 <div class="ref-preview" id="clone-reference">
                     <div style="${challenge.reference.match(/\{([^}]+)\}/)?.[1]?.replace(/\n/g, ' ') || ''}">
                         ${challenge.html}
@@ -633,7 +782,7 @@ function startCloneChallenge(challengeId) {
             <div class="game-editor">
                 <div class="code-panel">
                     <div class="panel-header">
-                        <h4>Your CSS</h4>
+                        <h4>${yourCSS}</h4>
                     </div>
                     <textarea id="clone-code" placeholder=".container {
     display: grid;
@@ -645,7 +794,7 @@ function startCloneChallenge(challengeId) {
                 </div>
                 <div class="preview-panel">
                     <div class="panel-header">
-                        <h4>Your Result</h4>
+                        <h4>${yourResult}</h4>
                     </div>
                     <div class="preview-content">
                         <div id="clone-preview">
@@ -656,9 +805,9 @@ function startCloneChallenge(challengeId) {
             </div>
             
             <div class="game-actions">
-                <button class="game-btn secondary" onclick="renderCloneChallengeMenu()">← Back</button>
-                <button class="game-btn primary" onclick="showCloneSolution()">👁️ Show Solution</button>
-                <button class="game-btn success" onclick="submitCloneChallenge()">✓ Submit</button>
+                <button class="game-btn secondary" onclick="renderCloneChallengeMenu()">← ${back}</button>
+                <button class="game-btn primary" onclick="showCloneSolution()">👁️ ${showSolution}</button>
+                <button class="game-btn success" onclick="submitCloneChallenge()">✓ ${submit}</button>
             </div>
         </div>
     `;
@@ -694,11 +843,17 @@ function submitCloneChallenge() {
     const code = document.getElementById('clone-code').value;
     const result = compareCSS(code, currentChallenge.reference);
     
+    // Localized strings
+    const cloneComplete = getGameText('gameModes.cloneChallenge.cloneComplete', 'Clone Complete!');
+    const accuracyText = getGameText('gameModes.gridBattle.accuracy', 'Accuracy');
+    const moreClones = getGameText('gameModes.cloneChallenge.nextClone', 'More Clones');
+    const closeMatch = getGameText('gameModes.cloneChallenge.closeMatch', 'Close Match!');
+    
     if (result.accuracy >= 70) {
         if (!gameState.cloneStats.completed) gameState.cloneStats.completed = [];
         if (!gameState.cloneStats.completed.includes(currentChallenge.id)) {
             gameState.cloneStats.completed.push(currentChallenge.id);
-            gameState.addXP(XP_REWARDS.cloneComplete, 'Clone Complete!');
+            gameState.addXP(XP_REWARDS.cloneComplete, cloneComplete);
             
             if (!gameState.hasAchievement('cloneWarrior')) {
                 gameState.unlockAchievement('cloneWarrior');
@@ -714,21 +869,21 @@ function submitCloneChallenge() {
         container.innerHTML = `
             <div class="game-container">
                 <div class="game-header">
-                    <h1>🎉 Great Clone!</h1>
+                    <h1>🎉 ${cloneComplete}</h1>
                 </div>
                 
                 <div class="score-display">
                     <div class="score-value">${result.accuracy}%</div>
-                    <p style="color: var(--success);">Accuracy</p>
+                    <p style="color: var(--success);">${accuracyText}</p>
                 </div>
                 
                 <div class="game-actions">
-                    <button class="game-btn secondary" onclick="renderCloneChallengeMenu()">← More Clones</button>
+                    <button class="game-btn secondary" onclick="renderCloneChallengeMenu()">← ${moreClones}</button>
                 </div>
             </div>
         `;
     } else {
-        alert(`${result.accuracy}% accuracy - try to match the reference more closely!`);
+        alert(`${result.accuracy}% ${accuracyText} - ${closeMatch}`);
     }
 }
 
@@ -739,6 +894,15 @@ function renderDailyChallenge() {
     const isComplete = isDailyChallengeComplete();
     
     const container = document.getElementById('game-container');
+    
+    // Localized strings
+    const title = getGameText('gameModes.dailyChallenge.title', 'Daily Challenge');
+    const back = getGameText('ui.back', 'Back');
+    const dayStreak = getGameText('gameModes.dailyChallenge.currentStreak', 'Day Streak');
+    const todaysChallenge = getGameText('gameModes.dailyChallenge.subtitle', "Today's Challenge");
+    const completedToday = getGameText('gameModes.dailyChallenge.completedToday', 'Completed Today');
+    const comeBackTomorrow = getGameText('gameModes.dailyChallenge.comeBackTomorrow', 'Come back tomorrow for a new one!');
+    const startChallenge = getGameText('ui.start', 'Start');
     
     // Build calendar
     const today = new Date();
@@ -755,15 +919,15 @@ function renderDailyChallenge() {
     container.innerHTML = `
         <div class="game-container">
             <div class="game-header">
-                <h1>📅 Daily Challenge</h1>
-                <button class="game-btn secondary" onclick="backToLessons()">← Back</button>
+                <h1>📅 ${title}</h1>
+                <button class="game-btn secondary" onclick="backToLessons()">← ${back}</button>
             </div>
             
             <div class="streak-display">
                 <span class="fire-emoji">🔥</span>
                 <div>
                     <div class="streak-number">${gameState.dailyStats.currentStreak || 0}</div>
-                    <div class="streak-label">Day Streak</div>
+                    <div class="streak-label">${dayStreak}</div>
                 </div>
             </div>
             
@@ -776,8 +940,8 @@ function renderDailyChallenge() {
             </div>
             
             <div class="challenge-card">
-                <h2>Today's Challenge: ${challenge.name}</h2>
-                <p class="description">${challenge.description || 'Complete today\'s challenge!'}</p>
+                <h2>${todaysChallenge}: ${challenge.name}</h2>
+                <p class="description">${challenge.description || todaysChallenge}</p>
                 <span class="difficulty difficulty-${challenge.difficulty || 2}">
                     Type: ${challenge.type === 'gridBattle' ? '⚔️ Grid Battle' : 
                            challenge.type === 'debug' ? '🔍 Debug' : '🎨 Clone'}
@@ -787,15 +951,15 @@ function renderDailyChallenge() {
             ${isComplete ? `
                 <div class="score-display">
                     <div class="score-value">✓</div>
-                    <p style="color: var(--success);">Completed! Come back tomorrow.</p>
+                    <p style="color: var(--success);">${completedToday}! ${comeBackTomorrow}</p>
                 </div>
                 <button class="share-btn" onclick="shareDailyResult()" style="margin: 20px auto; display: flex;">
-                    📤 Share Result
+                    📤 Share
                 </button>
             ` : `
                 <div class="game-actions">
                     <button class="game-btn primary" onclick="startDailyChallenge()">
-                        Start Today's Challenge
+                        ${startChallenge} ${todaysChallenge}
                     </button>
                 </div>
             `}
@@ -835,22 +999,36 @@ function shareDailyResult() {
 }
 
 // ============== ACHIEVEMENTS ==============
+function getAchievementName(id) {
+    return window.i18n?.t(`achievementNames.${id}`) || ACHIEVEMENTS[id]?.name || id;
+}
+
+function getAchievementDescription(id) {
+    return getGameText(`achievementDescriptions.${id}`, ACHIEVEMENTS[id]?.description || '');
+}
+
 function renderAchievements() {
     const container = document.getElementById('game-container');
     
     const achievementList = Object.values(ACHIEVEMENTS);
     
+    // Localized strings
+    const title = getGameText('gameModes.achievements.title', 'Achievements');
+    const back = getGameText('ui.back', 'Back');
+    const yourProgress = getGameText('gameModes.achievements.subtitle', 'Your Progress');
+    const achievementsUnlocked = getGameText('gameModes.achievements.achievementsUnlocked', 'achievements unlocked');
+    
     container.innerHTML = `
         <div class="game-container">
             <div class="game-header">
-                <h1>🏆 Achievements</h1>
-                <button class="game-btn secondary" onclick="backToLessons()">← Back</button>
+                <h1>🏆 ${title}</h1>
+                <button class="game-btn secondary" onclick="backToLessons()">← ${back}</button>
             </div>
             
             <div class="challenge-card">
-                <h2>Your Progress</h2>
+                <h2>${yourProgress}</h2>
                 <p class="description">
-                    ${gameState.achievements.length} / ${achievementList.length} achievements unlocked
+                    ${gameState.achievements.length} / ${achievementList.length} ${achievementsUnlocked}
                 </p>
                 <div class="stat-xp-bar" style="margin-top: 12px;">
                     <div class="fill" style="width: ${(gameState.achievements.length / achievementList.length) * 100}%"></div>
@@ -861,8 +1039,8 @@ function renderAchievements() {
                 ${achievementList.map(a => `
                     <div class="achievement-card ${gameState.hasAchievement(a.id) ? 'unlocked' : 'locked'}">
                         <div class="achievement-icon">${a.emoji}</div>
-                        <div class="achievement-name">${a.name}</div>
-                        <div class="achievement-desc">${a.description}</div>
+                        <div class="achievement-name">${getAchievementName(a.id)}</div>
+                        <div class="achievement-desc">${getAchievementDescription(a.id)}</div>
                         <div style="margin-top: 8px; color: var(--accent); font-size: 0.85rem;">
                             +${a.xpReward} XP
                         </div>

@@ -386,6 +386,34 @@ class LocalizationSystem {
         this.observers = [];
     }
 
+    // Get content translation (from content-translations.js)
+    getContent(path) {
+        if (!window.CONTENT_TRANSLATIONS) return path;
+        
+        const keys = path.split('.');
+        let value = window.CONTENT_TRANSLATIONS;
+        
+        for (const key of keys) {
+            if (value && value[key] !== undefined) {
+                value = value[key];
+            } else {
+                return path;
+            }
+        }
+        
+        // If value is an object with language keys, return the appropriate language
+        if (value && typeof value === 'object' && (value.en !== undefined || value.ka !== undefined)) {
+            return value[this.currentLang] || value.en || path;
+        }
+        
+        return value;
+    }
+
+    // Shorthand for content translation
+    tc(path) {
+        return this.getContent(path);
+    }
+
     setLanguage(lang) {
         if (!this.translations[lang]) {
             console.warn(`Language '${lang}' not supported. Falling back to English.`);
