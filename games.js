@@ -836,6 +836,223 @@ grid-template-rows: 200px auto;
 gap: 20px;`,
         html: '<div class="item" style="grid-column: 1 / -1">Hero Image</div><div class="item">Card 1</div><div class="item">Card 2</div><div class="item">Card 3</div>',
         hints: ['Hero spans all columns', 'First row fixed height', 'Cards auto-size below']
+    },
+    // ============== BOSS BATTLES (Extra Hard) ==============
+    {
+        id: 36,
+        name: "🏆 Boss: Full Dashboard",
+        difficulty: 5,
+        timeLimit: 180,
+        category: 'boss',
+        description: "Create a complete dashboard with sidebar, header, widgets, and main content",
+        targetCSS: `display: grid;
+grid-template-columns: 200px 1fr 300px;
+grid-template-rows: 60px 1fr 60px;
+grid-template-areas:
+    "sidebar header header"
+    "sidebar main widgets"
+    "sidebar footer footer";
+gap: 10px;
+height: 100%;`,
+        html: '<div class="item" style="grid-area: sidebar">Sidebar</div><div class="item" style="grid-area: header">Header</div><div class="item" style="grid-area: main">Main</div><div class="item" style="grid-area: widgets">Widgets</div><div class="item" style="grid-area: footer">Footer</div>',
+        hints: ['Use grid-template-areas', '3 columns: sidebar, main, widgets', '3 rows: header, content, footer'],
+        xp: 200
+    },
+    {
+        id: 37,
+        name: "🏆 Boss: E-Commerce Grid",
+        difficulty: 5,
+        timeLimit: 180,
+        category: 'boss',
+        description: "Product listing with filters, featured item, and pagination",
+        targetCSS: `display: grid;
+grid-template-columns: 250px repeat(auto-fill, minmax(200px, 1fr));
+grid-template-rows: auto 1fr auto;
+gap: 20px;`,
+        html: '<div class="item" style="grid-row: 1 / -1">Filters</div><div class="item" style="grid-column: 2 / -1">Breadcrumbs</div><div class="item featured">Featured</div><div class="item">Product</div><div class="item">Product</div><div class="item">Product</div><div class="item" style="grid-column: 2 / -1">Pagination</div>',
+        hints: ['Sticky sidebar for filters', 'Auto-fill for products', 'Featured item spans'],
+        xp: 200
+    },
+    {
+        id: 38,
+        name: "🏆 Boss: Magazine Cover",
+        difficulty: 5,
+        timeLimit: 180,
+        category: 'boss',
+        description: "Recreate a magazine-style layout with overlapping elements",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(6, 1fr);
+grid-template-rows: repeat(4, 100px);
+gap: 15px;`,
+        html: '<div class="item" style="grid-column: 1/4; grid-row: 1/3">Cover Story</div><div class="item" style="grid-column: 4/7; grid-row: 1/2">Top Story</div><div class="item" style="grid-column: 4/6; grid-row: 2/4">Feature</div><div class="item" style="grid-column: 6/7; grid-row: 2/4">Side</div><div class="item" style="grid-column: 1/3; grid-row: 3/5">Article</div><div class="item" style="grid-column: 3/5; grid-row: 3/5">Gallery</div><div class="item" style="grid-column: 5/7; grid-row: 4/5">Quote</div>',
+        hints: ['6 columns, 4 rows', 'Each section spans different areas', 'No gaps between sections'],
+        xp: 200
+    },
+    {
+        id: 39,
+        name: "🏆 Boss: Social Feed",
+        difficulty: 5,
+        timeLimit: 180,
+        category: 'boss',
+        description: "Create a social media feed with stories, posts, and sidebar",
+        targetCSS: `display: grid;
+grid-template-columns: 1fr 2fr 1fr;
+grid-template-rows: auto 1fr;
+gap: 20px;`,
+        html: '<div class="item" style="grid-column: 2/3; grid-row: 1">Stories</div><div class="item" style="grid-column: 1/2; grid-row: 1/3">Left Sidebar</div><div class="item" style="grid-column: 2/3">Post 1</div><div class="item" style="grid-column: 2/3">Post 2</div><div class="item" style="grid-column: 3/4; grid-row: 1/3">Right Sidebar</div>',
+        hints: ['3 columns: left, main, right', 'Main content in center', 'Sidebars span full height'],
+        xp: 200
+    },
+    {
+        id: 40,
+        name: "🏆 Boss: Portfolio Masonry",
+        difficulty: 5,
+        timeLimit: 180,
+        category: 'boss',
+        description: "Masonry-style portfolio with varied item sizes",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(4, 1fr);
+grid-auto-rows: 100px;
+grid-auto-flow: dense;
+gap: 10px;`,
+        html: '<div class="item" style="grid-column: span 2; grid-row: span 2">Large Project</div><div class="item">Small 1</div><div class="item">Small 2</div><div class="item" style="grid-row: span 2">Tall Project</div><div class="item" style="grid-column: span 2">Wide Project</div><div class="item">Small 3</div><div class="item">Small 4</div>',
+        hints: ['4 columns', 'Dense auto-flow fills gaps', 'Various span sizes'],
+        xp: 200
+    },
+    // ============== MORE ADVANCED CHALLENGES ==============
+    {
+        id: 41,
+        name: "CSS Variables Grid",
+        difficulty: 4,
+        timeLimit: 90,
+        category: 'advanced',
+        description: "Use CSS variables for grid sizing",
+        targetCSS: `--cols: 4;
+--gap: 15px;
+display: grid;
+grid-template-columns: repeat(var(--cols), 1fr);
+gap: var(--gap);`,
+        gridItems: 8,
+        hints: ['Define CSS variables', 'Use var() in grid properties']
+    },
+    {
+        id: 42,
+        name: "Subgrid Layout",
+        difficulty: 4,
+        timeLimit: 90,
+        category: 'advanced',
+        description: "Create a card with subgrid alignment",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 20px;`,
+        html: '<div class="item card" style="display: grid; grid-template-rows: auto 1fr auto;">Title<p>Content</p>Button</div><div class="item card" style="display: grid; grid-template-rows: auto 1fr auto;">Long Title Here<p>More content than the others</p>Button</div><div class="item card" style="display: grid; grid-template-rows: auto 1fr auto;">Title<p>Short</p>Button</div>',
+        hints: ['Parent grid for cards', 'Cards use internal grid', 'Rows: title, content, button']
+    },
+    {
+        id: 43,
+        name: "Aspect Ratio Grid",
+        difficulty: 3,
+        timeLimit: 75,
+        category: 'advanced',
+        description: "Create square grid items",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 10px;`,
+        html: '<div class="item" style="aspect-ratio: 1">1</div><div class="item" style="aspect-ratio: 1">2</div><div class="item" style="aspect-ratio: 1">3</div><div class="item" style="aspect-ratio: 1">4</div><div class="item" style="aspect-ratio: 1">5</div><div class="item" style="aspect-ratio: 1">6</div>',
+        hints: ['aspect-ratio: 1 for squares', 'Grid handles the sizing']
+    },
+    {
+        id: 44,
+        name: "Overlay Grid",
+        difficulty: 3,
+        timeLimit: 60,
+        category: 'advanced',
+        description: "Create overlapping items",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(3, 1fr);
+grid-template-rows: repeat(3, 100px);`,
+        html: '<div class="item" style="grid-column: 1/3; grid-row: 1/3; background: rgba(99, 102, 241, 0.5)">Background</div><div class="item" style="grid-column: 2/4; grid-row: 2/4; background: rgba(236, 72, 153, 0.5)">Overlay</div>',
+        hints: ['Items can overlap', 'Use semi-transparent backgrounds', 'Explicit placement']
+    },
+    {
+        id: 45,
+        name: "Named Lines Magic",
+        difficulty: 4,
+        timeLimit: 90,
+        category: 'advanced',
+        description: "Use named grid lines",
+        targetCSS: `display: grid;
+grid-template-columns: [start] 200px [content-start] 1fr [content-end] 200px [end];
+gap: 20px;`,
+        html: '<div class="item" style="grid-column: start / content-start">Sidebar</div><div class="item" style="grid-column: content-start / content-end">Main</div><div class="item" style="grid-column: content-end / end">Aside</div>',
+        hints: ['Name your lines', 'Reference names in placement', 'Makes code readable']
+    },
+    // ============== MORE SPEED CHALLENGES ==============
+    {
+        id: 46,
+        name: "Quick Footer",
+        difficulty: 1,
+        timeLimit: 25,
+        category: 'speed',
+        description: "3-column footer",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 20px;
+text-align: center;`,
+        gridItems: 3,
+        hints: ['3 equal columns', 'Center text']
+    },
+    {
+        id: 47,
+        name: "Quick Nav",
+        difficulty: 1,
+        timeLimit: 25,
+        category: 'speed',
+        description: "Horizontal navigation",
+        targetCSS: `display: grid;
+grid-auto-flow: column;
+gap: 10px;`,
+        gridItems: 5,
+        hints: ['Column flow', 'Auto-size each']
+    },
+    {
+        id: 48,
+        name: "Quick Form",
+        difficulty: 2,
+        timeLimit: 30,
+        category: 'speed',
+        description: "Label and input pairs",
+        targetCSS: `display: grid;
+grid-template-columns: auto 1fr;
+gap: 10px 20px;`,
+        html: '<div class="item">Label</div><div class="item">Input</div><div class="item">Label</div><div class="item">Input</div>',
+        hints: ['Auto for labels', '1fr for inputs']
+    },
+    {
+        id: 49,
+        name: "Quick Stats",
+        difficulty: 1,
+        timeLimit: 25,
+        category: 'speed',
+        description: "4-stat dashboard",
+        targetCSS: `display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 15px;`,
+        gridItems: 4,
+        hints: ['4 equal columns']
+    },
+    {
+        id: 50,
+        name: "Quick Hero",
+        difficulty: 2,
+        timeLimit: 30,
+        category: 'speed',
+        description: "Centered hero section",
+        targetCSS: `display: grid;
+place-items: center;
+min-height: 200px;`,
+        gridItems: 1,
+        hints: ['Single item centered', 'place-items: center']
     }
 ];
 
@@ -1046,6 +1263,202 @@ const DEBUG_CHALLENGES = [
 }`,
         hint: "template-rows only defines explicit rows, what about the rest?",
         explanation: "Use grid-auto-rows for implicit (auto-generated) rows"
+    },
+    // ============== MORE DEBUG CHALLENGES ==============
+    {
+        id: 11,
+        name: "Wrong Span Direction",
+        difficulty: 2,
+        description: "Item should span 2 columns but spans rows instead",
+        buggyCSS: `.item {
+    grid-row: span 2;
+}`,
+        fixedCSS: `.item {
+    grid-column: span 2;
+}`,
+        hint: "Columns go horizontal, rows go vertical...",
+        explanation: "Use grid-column for horizontal spanning, grid-row for vertical"
+    },
+    {
+        id: 12,
+        name: "Auto-fit vs Auto-fill",
+        difficulty: 3,
+        description: "Columns should expand to fill space but they don't",
+        buggyCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}`,
+        fixedCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}`,
+        hint: "auto-fill creates empty columns, auto-fit collapses them...",
+        explanation: "Use auto-fit when you want items to stretch to fill available space"
+    },
+    {
+        id: 13,
+        name: "Minmax Minimum Too Large",
+        difficulty: 2,
+        description: "Grid breaks on small screens",
+        buggyCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+}`,
+        fixedCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+    gap: 20px;
+}`,
+        hint: "What if the container is smaller than 400px?",
+        explanation: "Use min(100%, 400px) to prevent overflow on small screens"
+    },
+    {
+        id: 14,
+        name: "Place Items Confusion",
+        difficulty: 2,
+        description: "Items should be centered but only horizontal works",
+        buggyCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    height: 300px;
+    justify-items: center;
+}`,
+        fixedCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    height: 300px;
+    place-items: center;
+}`,
+        hint: "justify is horizontal, align is vertical...",
+        explanation: "place-items: center centers both horizontally and vertically"
+    },
+    {
+        id: 15,
+        name: "Grid Area Name Mismatch",
+        difficulty: 2,
+        description: "Header isn't positioned correctly",
+        buggyCSS: `.container {
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "sidebar main";
+}
+.header {
+    grid-area: head;
+}`,
+        fixedCSS: `.container {
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "sidebar main";
+}
+.header {
+    grid-area: header;
+}`,
+        hint: "Area names must match exactly...",
+        explanation: "The grid-area value must match the name in grid-template-areas"
+    },
+    {
+        id: 16,
+        name: "Dense Packing Missing",
+        difficulty: 3,
+        description: "There are unwanted gaps in the masonry layout",
+        buggyCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 100px;
+    gap: 10px;
+}`,
+        fixedCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 100px;
+    grid-auto-flow: dense;
+    gap: 10px;
+}`,
+        hint: "There's a way to automatically fill gaps...",
+        explanation: "grid-auto-flow: dense fills gaps by reordering items"
+    },
+    {
+        id: 17,
+        name: "Overflow Hidden Breaks Grid",
+        difficulty: 2,
+        description: "Content is being cut off unexpectedly",
+        buggyCSS: `.container {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    overflow: hidden;
+    gap: 20px;
+}`,
+        fixedCSS: `.container {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 20px;
+}`,
+        hint: "1fr has a minimum content size...",
+        explanation: "Use minmax(0, 1fr) to allow the track to shrink below content size"
+    },
+    {
+        id: 18,
+        name: "Negative Line Numbers",
+        difficulty: 3,
+        description: "Item should go to the last column but doesn't",
+        buggyCSS: `.item {
+    grid-column: 1 / 4;
+}`,
+        fixedCSS: `.item {
+    grid-column: 1 / -1;
+}`,
+        hint: "What if the number of columns changes?",
+        explanation: "-1 always refers to the last line, making it dynamic"
+    },
+    {
+        id: 19,
+        name: "Repeat with Fixed Columns",
+        difficulty: 2,
+        description: "Columns should be responsive but they're fixed",
+        buggyCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(3, 250px);
+    gap: 20px;
+}`,
+        fixedCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}`,
+        hint: "Fixed columns don't adapt to screen size...",
+        explanation: "Use auto-fit/auto-fill with minmax for responsive grids"
+    },
+    {
+        id: 20,
+        name: "Z-Index Without Position",
+        difficulty: 3,
+        description: "Overlapping grid items aren't stacking correctly",
+        buggyCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+.overlay {
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+    z-index: 10;
+}`,
+        fixedCSS: `.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+.overlay {
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+    position: relative;
+    z-index: 10;
+}`,
+        hint: "z-index needs something to work with...",
+        explanation: "z-index requires position: relative/absolute to work in grid"
     }
 ];
 

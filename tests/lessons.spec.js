@@ -315,7 +315,7 @@ test.describe('Game System', () => {
     await expect(page.locator('.challenge-list')).toBeVisible();
     
     // Check that challenges are listed
-    await expect(page.locator('.challenge-list-item')).toHaveCount(35); // All challenges
+    await expect(page.locator('.challenge-list-item')).toHaveCount(50); // All challenges (35 + 15 new)
   });
 
   test('Grid Battle category filter works', async ({ page }) => {
@@ -323,7 +323,7 @@ test.describe('Game System', () => {
     
     // Wait for challenges to load
     await expect(page.locator('.challenge-list')).toBeVisible();
-    await expect(page.locator('.challenge-list-item')).toHaveCount(35, { timeout: 10000 });
+    await expect(page.locator('.challenge-list-item')).toHaveCount(50, { timeout: 10000 });
     
     // Click "Responsive" category filter (inside game-container, not sidebar)
     await page.locator('#game-container button:has-text("Responsive")').click();
@@ -351,8 +351,8 @@ test.describe('Game System', () => {
     await expect(page.locator('h1:has-text("Debug Detective")')).toBeVisible();
     await expect(page.locator('.challenge-list')).toBeVisible();
     
-    // Check that challenges are listed (10)
-    await expect(page.locator('.challenge-list-item')).toHaveCount(10);
+    // Check that challenges are listed (20 total: 10 original + 10 new)
+    await expect(page.locator('.challenge-list-item')).toHaveCount(20);
   });
 
   test('can start a Debug challenge', async ({ page }) => {
