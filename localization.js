@@ -151,6 +151,33 @@ const TRANSLATIONS = {
             startLearning: 'Start Learning!'
         },
 
+        // Cheatsheet
+        cheatsheet: {
+            title: 'CSS Grid Quick Reference',
+            containerProps: 'Container Properties',
+            itemPlacement: 'Item Placement',
+            alignment: 'Alignment',
+            responsiveMagic: 'Responsive Magic',
+            // Container descriptions
+            createsGrid: 'Creates a grid container',
+            defineColumns: 'Define column sizes',
+            defineRows: 'Define row sizes',
+            spaceBetween: 'Space between items',
+            nameRegions: 'Name grid regions',
+            // Placement descriptions
+            spanColumns: 'Span columns 1-2',
+            spanRows: 'Span 2 rows',
+            placeInArea: 'Place in named area',
+            // Alignment descriptions
+            horizontalCell: 'Horizontal in cell',
+            verticalCell: 'Vertical in cell',
+            centerBoth: 'Center both axes',
+            // Responsive descriptions
+            autoResponsive: 'Auto-responsive columns',
+            fractionSpace: 'Fraction of free space',
+            sizeRange: 'Size range'
+        },
+
         // Accessibility
         a11y: {
             settings: 'Accessibility Settings',
@@ -307,6 +334,32 @@ const TRANSLATIONS = {
             readyDesc: 'თითოეულ გაკვეთილს აქვს ახსნა, კოდის რედაქტორი და ვიზუალური გადახედვა.',
             skipTour: 'ტურის გამოტოვება',
             startLearning: 'დაიწყე სწავლა!'
+        },
+
+        cheatsheet: {
+            title: 'CSS Grid სწრაფი მითითება',
+            containerProps: 'კონტეინერის თვისებები',
+            itemPlacement: 'ელემენტის განთავსება',
+            alignment: 'გასწორება',
+            responsiveMagic: 'რესპონსიული მაგია',
+            // Container descriptions
+            createsGrid: 'ქმნის Grid კონტეინერს',
+            defineColumns: 'განსაზღვრავს სვეტების ზომას',
+            defineRows: 'განსაზღვრავს რიგების ზომას',
+            spaceBetween: 'დაშორება ელემენტებს შორის',
+            nameRegions: 'დაასახელებს Grid რეგიონებს',
+            // Placement descriptions
+            spanColumns: 'გაშლა 1-2 სვეტზე',
+            spanRows: 'გაშლა 2 რიგზე',
+            placeInArea: 'განთავსება დასახელებულ არეში',
+            // Alignment descriptions
+            horizontalCell: 'ჰორიზონტალური უჯრაში',
+            verticalCell: 'ვერტიკალური უჯრაში',
+            centerBoth: 'ცენტრირება ორივე ღერძზე',
+            // Responsive descriptions
+            autoResponsive: 'ავტო-რესპონსიული სვეტები',
+            fractionSpace: 'თავისუფალი სივრცის ნაწილი',
+            sizeRange: 'ზომის დიაპაზონი'
         },
 
         a11y: {
@@ -533,6 +586,65 @@ class LocalizationSystem {
                 btn.classList.add('active');
             }
         });
+
+        // ============== CHEATSHEET TRANSLATIONS ==============
+        const cheatsheetModal = document.getElementById('cheatsheet-modal');
+        if (cheatsheetModal) {
+            // Update title
+            const title = cheatsheetModal.querySelector('.modal-content > h2');
+            if (title) {
+                title.textContent = this.get('cheatsheet.title');
+            }
+
+            // Update section headers
+            const sections = cheatsheetModal.querySelectorAll('.cheatsheet-section');
+            const sectionKeys = ['containerProps', 'itemPlacement', 'alignment', 'responsiveMagic'];
+            sections.forEach((section, index) => {
+                const h3 = section.querySelector('h3');
+                if (h3 && sectionKeys[index]) {
+                    h3.textContent = this.get('cheatsheet.' + sectionKeys[index]);
+                }
+            });
+
+            // Update cheatsheet item descriptions
+            const descriptionMap = {
+                'Creates a grid container': 'cheatsheet.createsGrid',
+                'ქმნის Grid კონტეინერს': 'cheatsheet.createsGrid',
+                'Define column sizes': 'cheatsheet.defineColumns',
+                'განსაზღვრავს სვეტების ზომას': 'cheatsheet.defineColumns',
+                'Define row sizes': 'cheatsheet.defineRows',
+                'განსაზღვრავს რიგების ზომას': 'cheatsheet.defineRows',
+                'Space between items': 'cheatsheet.spaceBetween',
+                'დაშორება ელემენტებს შორის': 'cheatsheet.spaceBetween',
+                'Name grid regions': 'cheatsheet.nameRegions',
+                'დაასახელებს Grid რეგიონებს': 'cheatsheet.nameRegions',
+                'Span columns 1-2': 'cheatsheet.spanColumns',
+                'გაშლა 1-2 სვეტზე': 'cheatsheet.spanColumns',
+                'Span 2 rows': 'cheatsheet.spanRows',
+                'გაშლა 2 რიგზე': 'cheatsheet.spanRows',
+                'Place in named area': 'cheatsheet.placeInArea',
+                'განთავსება დასახელებულ არეში': 'cheatsheet.placeInArea',
+                'Horizontal in cell': 'cheatsheet.horizontalCell',
+                'ჰორიზონტალური უჯრაში': 'cheatsheet.horizontalCell',
+                'Vertical in cell': 'cheatsheet.verticalCell',
+                'ვერტიკალური უჯრაში': 'cheatsheet.verticalCell',
+                'Center both axes': 'cheatsheet.centerBoth',
+                'ცენტრირება ორივე ღერძზე': 'cheatsheet.centerBoth',
+                'Auto-responsive columns': 'cheatsheet.autoResponsive',
+                'ავტო-რესპონსიული სვეტები': 'cheatsheet.autoResponsive',
+                'Fraction of free space': 'cheatsheet.fractionSpace',
+                'თავისუფალი სივრცის ნაწილი': 'cheatsheet.fractionSpace',
+                'Size range': 'cheatsheet.sizeRange',
+                'ზომის დიაპაზონი': 'cheatsheet.sizeRange'
+            };
+
+            cheatsheetModal.querySelectorAll('.cheatsheet-item span').forEach(span => {
+                const text = span.textContent.trim();
+                if (descriptionMap[text]) {
+                    span.textContent = this.get(descriptionMap[text]);
+                }
+            });
+        }
     }
 
     // Create language switcher UI
