@@ -388,8 +388,8 @@ test.describe('Game System', () => {
     await expect(page.locator('h1:has-text("Achievements")')).toBeVisible();
     await expect(page.locator('.achievements-grid')).toBeVisible();
     
-    // Should show all achievement cards (15)
-    await expect(page.locator('.achievement-card')).toHaveCount(15);
+    // Should show all achievement cards (25 total: 15 original + 10 new)
+    await expect(page.locator('.achievement-card')).toHaveCount(25);
   });
 
   test('back to lessons button works', async ({ page }) => {

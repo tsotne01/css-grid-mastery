@@ -129,6 +129,77 @@ const ACHIEVEMENTS = {
         description: 'Try all game modes', 
         emoji: '🎮',
         xpReward: 100 
+    },
+    // New achievements
+    bossSlayer: {
+        id: 'bossSlayer',
+        name: 'Boss Slayer',
+        description: 'Complete a Boss Battle challenge',
+        emoji: '👹',
+        xpReward: 150
+    },
+    survivalPro: {
+        id: 'survivalPro',
+        name: 'Survival Pro',
+        description: 'Score 500+ in Survival Mode',
+        emoji: '💀',
+        xpReward: 100
+    },
+    speedRunner: {
+        id: 'speedRunner',
+        name: 'Speed Runner',
+        description: 'Complete Speed Run under 3 minutes',
+        emoji: '🏃',
+        xpReward: 150
+    },
+    puzzleMaster: {
+        id: 'puzzleMaster',
+        name: 'Puzzle Master',
+        description: 'Complete all Puzzle Mode challenges',
+        emoji: '🧩',
+        xpReward: 100
+    },
+    nightOwl: {
+        id: 'nightOwl',
+        name: 'Night Owl',
+        description: 'Practice after midnight',
+        emoji: '🦉',
+        xpReward: 50
+    },
+    earlyBird: {
+        id: 'earlyBird',
+        name: 'Early Bird',
+        description: 'Practice before 7 AM',
+        emoji: '🐦',
+        xpReward: 50
+    },
+    centurion: {
+        id: 'centurion',
+        name: 'Centurion',
+        description: 'Complete 100 challenges total',
+        emoji: '💯',
+        xpReward: 300
+    },
+    xpHoarder: {
+        id: 'xpHoarder',
+        name: 'XP Hoarder',
+        description: 'Earn 5000 XP total',
+        emoji: '💰',
+        xpReward: 200
+    },
+    socialButterfly: {
+        id: 'socialButterfly',
+        name: 'Social Butterfly',
+        description: 'Share your progress',
+        emoji: '🦋',
+        xpReward: 50
+    },
+    weekendWarrior: {
+        id: 'weekendWarrior',
+        name: 'Weekend Warrior',
+        description: 'Complete 5 challenges on a weekend',
+        emoji: '🎉',
+        xpReward: 75
     }
 };
 
